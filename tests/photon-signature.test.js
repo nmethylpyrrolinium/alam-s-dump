@@ -7,7 +7,6 @@ const {
   rgbToHsl,
   scoreSignature,
   isSupportedImageFile,
-  formatTimestamp,
   REFERENCE_SIGNATURE,
 } = require('../app.js');
 

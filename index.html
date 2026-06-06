@@ -87,19 +87,25 @@
 
       <section class="lab section-shell" id="lab">
         <div class="lab-copy">
-          <p class="eyebrow">01 / ADD PHOTO</p>
-          <h2>Put something in.</h2>
+          <p class="eyebrow">Live browser implementation</p>
+          <h2>Pick a photo. Wreck it locally. Keep the evidence.</h2>
+          <p>
+            Use the controls to stress the forensic parameters. Processing uses
+            Canvas ImageData, deterministic grain, HSL hue remapping, a shaped
+            tone LUT, ordered dither, bloom, unsharp masking, and a timestamp
+            compositor.
+          </p>
           <div class="file-drop" id="dropZone">
             <input id="imageInput" type="file" accept="image/*" />
             <input id="cameraInput" type="file" accept="image/*" capture="environment" />
             <span class="drop-kicker">DROP ZONE / PRIVATE BY DEFAULT</span>
-            <strong>Drop a photo.</strong>
-            <small>Stays on your device.</small>
+            <strong>Drag a photo here or choose how to add one.</strong>
+            <small>Images are processed in your browser and never uploaded.</small>
             <div class="upload-actions">
               <label class="upload-button primary-upload" for="imageInput">Choose from library</label>
               <label class="upload-button" for="cameraInput">Take a photo</label>
             </div>
-            <p id="uploadStatus" class="upload-status" role="status" aria-live="polite">Ready.</p>
+            <p id="uploadStatus" class="upload-status" role="status" aria-live="polite">Ready for JPG, PNG, WebP, GIF, or browser-supported image files.</p>
           </div>
         </div>
 
@@ -184,18 +190,34 @@
         </div>
       </section>
 
-      <section class="photo-wall section-shell" id="wall">
-        <div class="wall-heading"><span class="eyebrow">FEATURED / WITH PERMISSION</span><h2>The wall.</h2><small>Session-only on this version.</small></div>
-        <div class="hanging-gallery" id="featuredGallery" aria-live="polite">
-          <figure class="hanging-photo placeholder"><canvas id="wallDemoA" width="410" height="547"></canvas><figcaption>ALAM’S DUMP</figcaption></figure>
-          <figure class="hanging-photo placeholder"><canvas id="wallDemoB" width="410" height="547"></canvas><figcaption>LOCAL / PRIVATE</figcaption></figure>
-          <p id="wallEmpty">Your approved edits hang here.</p>
+      <section class="rarities section-shell" aria-labelledby="raritiesTitle">
+        <p class="eyebrow">Labor-intensive effects, made immediate</p>
+        <h2 id="raritiesTitle">Artifacts that usually take hours to build by hand.</h2>
+        <div class="rarity-grid">
+          <article><span>01 / PRISM</span><h3>Radial channel separation</h3><p>Red and blue channels diverge progressively toward the lens edge instead of using a cheap global offset.</p></article>
+          <article><span>02 / FIELD</span><h3>Deterministic sensor scars</h3><p>Seeded dust, periodic scan fields, and high-frequency damage remain repeatable for real visual regression.</p></article>
+          <article><span>03 / HEAT</span><h3>Spatial light contamination</h3><p>A shaped orange-red leak reacts across the frame while keeping the reference pipeline underneath intact.</p></article>
+          <article><span>04 / SHEET</span><h3>Instant art-direction contact sheet</h3><p>Render four complete recipes from one source, then compare treatment families without rebuilding them manually.</p></article>
         </div>
+      </section>
+
+      <section class="pipeline section-shell" id="pipeline">
+        <p class="eyebrow">Exact processing order</p>
+        <h2>The mechanism of the photon engine</h2>
+        <ol class="pipeline-list">
+          <li><span>Crop</span>Center crop to a 3:4 vertical frame.</li>
+          <li><span>Resolve</span>Downscale to a low internal canvas for cheap sensor detail.</li>
+          <li><span>Tone</span>Exposure, black point, white point, gamma, and S-curve.</li>
+          <li><span>Color</span>Cool matrix, cyan shadows, hue-selective remapping.</li>
+          <li><span>Optics</span>Subtle bloom, vignette, radial prism split, and spatial heat leak.</li>
+          <li><span>Damage</span>Unsharp mask, RGB/luma noise, Bayer dither, scan field, sensor dust, and JPEG export.</li>
+          <li><span>Metadata</span>Hard white two-line monospaced timestamp with black edge.</li>
+        </ol>
       </section>
     </main>
 
     <footer class="site-footer">
-      <p>Alam’s Dump / local only.</p>
+      <p>Alam’s Dump — locally wrecking perfectly good photos since 2026.</p>
       <a href="#top">Back to top</a>
     </footer>
 

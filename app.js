@@ -644,7 +644,6 @@ function initialize() {
   let activeSource = sourceCanvas;
   let renderSeed = 20260516;
   let activeFileName = 'alams-dump';
-  let hasUserImage = false;
 
   const setStatus = (message, state = '') => {
     if (!uploadStatus) return;
@@ -652,41 +651,16 @@ function initialize() {
     uploadStatus.dataset.state = state;
   };
 
-  const resizeEditorCanvases = (params) => {
-    const sourceWidth = activeSource.naturalWidth || activeSource.width || DEFAULT_PARAMS.outputWidth;
-    const sourceHeight = activeSource.naturalHeight || activeSource.height || DEFAULT_PARAMS.outputHeight;
-    const aspect = params.aspectRatio || sourceWidth / sourceHeight;
-    const width = DEFAULT_PARAMS.outputWidth;
-    const height = Math.round(width / aspect);
-    [outputCanvas, sourcePreviewCanvas].forEach((canvas) => {
-      if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
-        canvas.height = height;
-      }
-    });
-  };
-
   const renderOutput = () => {
-    const params = currentParams();
-    resizeEditorCanvases(params);
-    renderRawPreview(activeSource, sourcePreviewCanvas, params);
-    renderSourceToCanvas(activeSource, outputCanvas, params, renderSeed);
+    renderSourceToCanvas(activeSource, outputCanvas, currentParams(), renderSeed);
     updateSignatureReport(sourcePreviewCanvas, outputCanvas);
-  };
-
-  const renderUserEdit = () => {
-    renderOutput();
-    if (hasUserImage) document.getElementById('featureAsk').hidden = false;
   };
 
   const renderAll = (source = activeSource) => {
     activeSource = source;
+    renderRawPreview(activeSource, sourcePreviewCanvas);
     renderOutput();
     renderSourceToCanvas(sourceCanvas, demoCanvas, { ...DEFAULT_PARAMS, lumaNoise: 20, contrast: 1.46 }, 20260404);
-    const wallDemoA = document.getElementById('wallDemoA');
-    const wallDemoB = document.getElementById('wallDemoB');
-    if (wallDemoA) renderSourceToCanvas(sourceCanvas, wallDemoA, { ...DEFAULT_PARAMS, motionStyle: 'ghost', motionAmount: 0.42 }, 20260405);
-    if (wallDemoB) renderSourceToCanvas(sourceCanvas, wallDemoB, { ...DEFAULT_PARAMS, motionStyle: 'trails', motionAmount: 0.48, lightLeakStrength: 0.28 }, 20260406);
   };
 
   const loadImageFile = (file) => {
@@ -703,10 +677,8 @@ function initialize() {
       URL.revokeObjectURL(url);
       activeFileName = (file.name || 'camera-photo').replace(/\.[^.]+$/, '').replace(/[^a-z0-9-_]+/gi, '-').toLowerCase();
       renderSeed = Math.max(1, Math.floor(file.lastModified || Date.now()) % 2147483647);
-      hasUserImage = true;
       renderAll(image);
-      document.getElementById('featureAsk').hidden = false;
-      setStatus(`${file.name || 'Camera photo'} ready.`, 'success');
+      setStatus(`${file.name || 'Camera photo'} is in the dump. Adjust it, remix the grain, then save or share.`, 'success');
     };
     image.onerror = () => {
       URL.revokeObjectURL(url);
@@ -793,8 +765,8 @@ function initialize() {
 
   document.getElementById('remixButton')?.addEventListener('click', () => {
     renderSeed = (renderSeed + 104729) % 2147483647;
-    renderUserEdit();
-    setStatus('New damage.', 'success');
+    renderOutput();
+    setStatus('Fresh grain, dust, and sensor scars generated. Same photo, different damage.', 'success');
   });
 
   document.getElementById('contactSheetButton')?.addEventListener('click', () => {
@@ -807,7 +779,7 @@ function initialize() {
       const tile = document.createElement('canvas');
       tile.width = 410;
       tile.height = 547;
-      renderSourceToCanvas(activeSource, tile, { ...currentParams(), ...overrides }, renderSeed + index * 101);
+      renderSourceToCanvas(activeSource, tile, { ...DEFAULT_PARAMS, ...overrides }, renderSeed + index * 101);
       const x = (index % 2) * 430 + 20;
       const y = Math.floor(index / 2) * 600 + 20;
       sheetContext.drawImage(tile, x, y, 410, 547);
@@ -818,10 +790,7 @@ function initialize() {
     sheet.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 
-  const outputBlob = () => {
-    renderOutput();
-    return new Promise((resolve) => outputCanvas.toBlob(resolve, 'image/jpeg', DEFAULT_PARAMS.jpegQuality));
-  };
+  const outputBlob = () => new Promise((resolve) => outputCanvas.toBlob(resolve, 'image/jpeg', DEFAULT_PARAMS.jpegQuality));
 
   document.getElementById('downloadButton')?.addEventListener('click', async () => {
     const blob = await outputBlob();
