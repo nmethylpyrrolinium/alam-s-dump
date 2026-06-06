@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@500;700;800;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@500;700;800;900&family=Share+Tech+Mono&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
@@ -31,25 +31,20 @@
         </span>
       </a>
       <nav aria-label="Primary navigation">
-        <a href="#engine">Engine</a>
-        <a href="#lab">Live lab</a>
-        <a href="#pipeline">Pipeline</a>
+        <a href="#lab">Edit</a>
+        <a href="#wall">Wall</a>
       </nav>
     </header>
 
     <main id="top">
       <section class="hero section-shell">
         <div class="hero-copy">
-          <p class="eyebrow">Your camera roll, beautifully wrecked</p>
-          <h1>
-            Throw a photo in the dump. Keep the version that feels real.
-          </h1>
-          <p class="lede">
-            Alam’s Dump turns camera-roll leftovers into digital keepsakes with cyan shadows, crushed blacks, sensor grit, light leaks, and timestamp scars. Everything stays on your device.
-          </p>
+          <p class="eyebrow">ALAM’S DUMP / 2026</p>
+          <h1>Photos look better with damage.</h1>
+          <p class="lede">Crop. Move. Timestamp. Dump.</p>
           <div class="hero-actions">
-            <a class="button primary" href="#lab">Open the dump lab</a>
-            <a class="button ghost" href="#pipeline">Read the mechanism</a>
+            <a class="button primary" href="#lab">Edit a photo</a>
+            <a class="button ghost" href="#wall">See the wall</a>
           </div>
           <dl class="metric-strip" aria-label="Reconstruction parameters">
             <div>
@@ -90,39 +85,6 @@
         </div>
       </section>
 
-      <section class="section-shell thesis" id="engine">
-        <p class="eyebrow">What the engine actually does</p>
-        <div class="thesis-grid">
-          <article>
-            <span class="card-index">01</span>
-            <h2>Color science with intent</h2>
-            <p>
-              The engine cools the white balance, pushes shadows toward cyan,
-              remaps blues toward teal, bends greens toward olive-yellow, and
-              keeps red/orange objects unnaturally alive.
-            </p>
-          </article>
-          <article>
-            <span class="card-index">02</span>
-            <h2>Tone curve before texture</h2>
-            <p>
-              A hard black/white point remap and steep S-curve create dense
-              silhouettes before the synthetic sensor field is injected back
-              into the image.
-            </p>
-          </article>
-          <article>
-            <span class="card-index">03</span>
-            <h2>Digital damage, not nostalgia</h2>
-            <p>
-              Low internal resolution, unsharp halos, RGB/luma speckle, Bayer
-              dither, bloom restraint, and JPEG quantization make the output
-              feel like an app-specific camera pipeline rather than film.
-            </p>
-          </article>
-        </div>
-      </section>
-
       <section class="lab section-shell" id="lab">
         <div class="lab-copy">
           <p class="eyebrow">Live browser implementation</p>
@@ -149,7 +111,7 @@
 
         <div class="lab-panel">
           <div class="preview-toolbar">
-            <strong>Before / photon output</strong>
+            <strong>02 / EDIT</strong>
             <div class="output-actions">
               <button id="remixButton" type="button" title="Generate a fresh deterministic grain pattern">New grain</button>
               <button id="shareButton" type="button">Share</button>
@@ -159,19 +121,46 @@
           <div class="canvas-compare" aria-label="Source image and filtered photon output comparison">
             <figure>
               <canvas id="sourceCanvas" width="410" height="547"></canvas>
-              <figcaption>Input crop</figcaption>
+              <figcaption>before</figcaption>
             </figure>
             <figure>
               <canvas id="outputCanvas" width="410" height="547"></canvas>
-              <figcaption>Full photon pipeline</figcaption>
+              <figcaption>after</figcaption>
             </figure>
           </div>
-          <div class="signature-panel" aria-live="polite">
+          <div class="signature-panel" aria-live="polite" hidden>
             <div>
               <span class="eyebrow">Automated image comparison</span>
               <strong id="signatureVerdict">Waiting for render…</strong>
             </div>
             <ul id="signatureReport"></ul>
+          </div>
+          <div class="tool-section">
+            <span class="tool-label">Crop</span>
+            <div class="choice-rail" id="cropRail" aria-label="Crop ratio">
+              <button class="active" type="button" data-crop="0.75">3:4</button>
+              <button type="button" data-crop="1">Square</button>
+              <button type="button" data-crop="0.5625">Story</button>
+              <button type="button" data-crop="1.333333">4:3</button>
+              <button type="button" data-crop="original">Original</button>
+            </div>
+            <label class="inline-range">Position <input id="cropPositionControl" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+          </div>
+          <div class="tool-section">
+            <span class="tool-label">Motion</span>
+            <div class="choice-rail" id="motionRail" aria-label="Motion damage">
+              <button class="active" type="button" data-motion="still">Still</button>
+              <button type="button" data-motion="shake">Shake</button>
+              <button type="button" data-motion="ghost">Ghost</button>
+              <button type="button" data-motion="trails">Trails</button>
+              <button type="button" data-motion="double">Double</button>
+            </div>
+            <label class="inline-range">Amount <input id="motionControl" type="range" min="0" max="1" step="0.01" value="0.45" /></label>
+          </div>
+          <div class="tool-section timestamp-tool">
+            <span class="tool-label">Timestamp</span>
+            <label class="toggle-line"><input id="timestampNow" type="checkbox" checked /> Use my current local time</label>
+            <input id="customTimestamp" type="datetime-local" disabled aria-label="Custom timestamp" />
           </div>
           <div class="preset-rail" aria-label="Effect recipes">
             <button class="active" type="button" data-preset="reference">Reference</button>
@@ -190,8 +179,12 @@
             <label>Heat leak<input id="leakControl" type="range" min="0" max="0.5" step="0.01" value="0.08" /></label>
           </div>
           <div class="contact-sheet-tool">
-            <div><strong>One source. Four forensic outcomes.</strong><small>Build a deterministic 2×2 contact sheet for art direction and comparison.</small></div>
-            <button id="contactSheetButton" type="button">Generate contact sheet</button>
+            <strong>Four versions.</strong>
+            <button id="contactSheetButton" type="button">Make sheet</button>
+          </div>
+          <div class="feature-ask" id="featureAsk" hidden>
+            <div><strong>Put this on the wall?</strong><small>Only shown in this browser session. Nothing is uploaded.</small></div>
+            <div><button id="featureYes" type="button">Yes, feature it</button><button id="featureNo" type="button">Not now</button></div>
           </div>
           <canvas id="contactSheetCanvas" width="880" height="1200" hidden></canvas>
         </div>

@@ -2,13 +2,14 @@
 
 A rare 3D landing page and browser-based forensic camera aesthetic engine. The app reconstructs the supplied Alam’s Dump look with Canvas pixel processing, low-resolution resampling, tone curves, color remapping, luma/RGB grain, ordered dither, bloom, sharpening, JPEG export, and a timestamp overlay.
 
-## Files
+## Highlights
 
-- `index.html` — semantic landing page and lab UI.
-- `styles.css` — 3D art direction, responsive layout, typography, and visual polish.
-- `app.js` — full client-side photon-processing mechanism plus output signature scoring.
-- `tests/photon-signature.test.js` — deterministic Node tests for crop behavior, hue remapping, seeded damage, and reference-signature ranges.
-- `package.json` — local scripts for serving and testing.
+- Separate photo-library and camera inputs, plus drag and drop.
+- Crop ratios with adjustable crop position.
+- Handheld shake, subject ghosting, light trails, and accidental double exposure.
+- Current local-time timestamps by default, with an optional custom date and time.
+- Explicit consent before an edited image is added to the session-only hanging photo wall.
+- Local processing, JPEG download/share, recipes, remixable damage, and contact sheets.
 
 ## Run locally
 
