@@ -1074,6 +1074,60 @@ function initialize() {
     setStatus('Kept private.', 'success');
   });
 
+  // Scroll-driven depth uses one animation-frame update, avoiding a render on every scroll event.
+  const memoryTunnel = document.getElementById('memoryTunnel');
+  let tunnelFrame = 0;
+  const updateTunnel = () => {
+    tunnelFrame = 0;
+    if (!memoryTunnel) return;
+    const rect = memoryTunnel.getBoundingClientRect();
+    const travel = Math.max(1, memoryTunnel.offsetHeight - window.innerHeight);
+    const progress = Math.min(1, Math.max(0, -rect.top / travel));
+    memoryTunnel.style.setProperty('--tunnel-progress', progress.toFixed(3));
+  };
+  const requestTunnelUpdate = () => {
+    if (!tunnelFrame) tunnelFrame = window.requestAnimationFrame(updateTunnel);
+  };
+  window.addEventListener('scroll', requestTunnelUpdate, { passive: true });
+  window.addEventListener('resize', requestTunnelUpdate, { passive: true });
+  updateTunnel();
+
+  const reveals = document.querySelectorAll('.reveal-on-scroll');
+  if ('IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.14 });
+    reveals.forEach((element) => revealObserver.observe(element));
+  } else {
+    reveals.forEach((element) => element.classList.add('is-visible'));
+  }
+
+  const authDialog = document.getElementById('authDialog');
+  const authStatus = document.getElementById('authStatus');
+  document.getElementById('loginTrigger')?.addEventListener('click', () => authDialog?.showModal());
+  document.getElementById('authClose')?.addEventListener('click', () => authDialog?.close());
+  authDialog?.addEventListener('click', (event) => {
+    if (event.target === authDialog) authDialog.close();
+  });
+  document.getElementById('googleLogin')?.addEventListener('click', async () => {
+    const supabase = window.supabaseClient;
+    if (!supabase?.auth?.signInWithOAuth) {
+      authStatus.textContent = 'Setup mode: connect window.supabaseClient, then Google sign-in is ready.';
+      return;
+    }
+    authStatus.textContent = 'Opening Google sign-in…';
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    });
+    if (error) authStatus.textContent = `Could not start sign-in: ${error.message}`;
+  });
+
 }
 
 if (typeof window !== 'undefined') {

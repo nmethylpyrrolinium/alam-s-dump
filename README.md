@@ -15,6 +15,8 @@ A private-feeling browser photo lab for restoring and styling digital keepsakes.
 
 ## Supabase wall: next steps
 
+For a connector-ready, security-focused implementation request covering Google OAuth, live tracking, Realtime, Storage, and RLS, use [`SUPABASE_CONNECTOR_PROMPT.md`](SUPABASE_CONNECTOR_PROMPT.md).
+
 You already created a Supabase project. The interface now previews the complete signed-in Wall flow locally; connect it to Supabase next:
 
 1. Enable Supabase Auth with email magic links or one-time passwords.
