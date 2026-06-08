@@ -33,7 +33,7 @@
       <nav aria-label="Primary navigation">
         <a href="#lab">Edit</a>
         <a href="#wall">Wall</a>
-        <button class="login-trigger" id="loginTrigger" type="button" aria-haspopup="dialog">Log in</button>
+        <a href="#lab">Hang a photo</a>
       </nav>
     </header>
 
@@ -68,12 +68,13 @@
             <span class="hanging-pin"></span>
             <span class="hanging-thread thread-left"></span>
             <span class="hanging-thread thread-right"></span>
-            <div class="hanging-banner"><small>ARCHIVE OBJECT</small><strong>MEMORY<br />IS A PLACE</strong><i></i></div>
+            <div class="hanging-banner"><small>OPEN WALL</small><strong>HANG<br />YOUR PHOTO</strong><i></i></div>
             <span class="hanging-tassel tassel-one"></span>
             <span class="hanging-tassel tassel-two"></span>
             <span class="hanging-tassel tassel-three"></span>
           </div>
           <div class="living-wall" id="featuredGallery" aria-live="polite">
+            <svg class="wall-rope" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M 0 27 Q 21 42 38 31 T 70 25 T 100 32" /></svg>
             <div class="wall-orbit orbit-one" aria-hidden="true"></div>
             <div class="wall-orbit orbit-two" aria-hidden="true"></div>
             <figure class="living-photo photo-main">
@@ -90,24 +91,6 @@
             </figure>
             <span class="wall-label">THE LIVING WALL · ALWAYS IN MOTION</span>
           </div>
-        </div>
-      </section>
-
-      <section class="memory-tunnel" id="memoryTunnel" aria-labelledby="tunnelTitle">
-        <div class="tunnel-sticky">
-          <div class="tunnel-copy reveal-on-scroll">
-            <p class="eyebrow">Scroll study / 001</p>
-            <h2 id="tunnelTitle">Walk through the archive.</h2>
-            <p>Every frame gains depth as you move. The wall is less a gallery, more a place you return to.</p>
-            <span class="scroll-cue">Scroll to enter <i aria-hidden="true"></i></span>
-          </div>
-          <div class="tunnel-scene" aria-hidden="true">
-            <article class="tunnel-card tunnel-card-a"><span>01</span><strong>Found light</strong><small>03:18:26</small></article>
-            <article class="tunnel-card tunnel-card-b"><span>02</span><strong>Night signal</strong><small>03:19:04</small></article>
-            <article class="tunnel-card tunnel-card-c"><span>03</span><strong>Heat memory</strong><small>03:20:41</small></article>
-            <div class="tunnel-core"><span>LIVE WALL</span><b>∞</b></div>
-          </div>
-          <div class="tunnel-progress"><span id="tunnelProgress"></span></div>
         </div>
       </section>
 
@@ -223,12 +206,12 @@
             <label>Heat leak<input id="leakControl" type="range" min="0" max="0.5" step="0.01" value="0.08" /></label>
           </div>
           <div class="contact-sheet-tool">
-            <strong>Four versions.</strong>
-            <button id="contactSheetButton" type="button">Make sheet</button>
+            <div><strong>Compare four versions</strong><small>No sheet space is reserved until you make one.</small></div>
+            <button id="contactSheetButton" type="button" aria-expanded="false" aria-controls="contactSheetCanvas">Make 4-sheet</button>
           </div>
           <div class="feature-ask" id="featureAsk" hidden>
-            <div><strong>Put this on the wall?</strong><small>It joins the living wall in this browser session. Nothing is uploaded.</small></div>
-            <div><button id="featureYes" type="button">Yes, feature it</button><button id="featureNo" type="button">Not now</button></div>
+            <div><strong>Hang this on the public wall?</strong><small>No login needed. Your approval makes it visible on the wall; connected deployments can publish it for everyone.</small></div>
+            <div><button id="featureYes" type="button">Approve &amp; hang</button><button id="featureNo" type="button">Keep private</button></div>
           </div>
           <canvas id="contactSheetCanvas" width="880" height="1200" hidden></canvas>
         </div>
@@ -259,15 +242,6 @@
         </ol>
       </section>
     </main>
-
-    <dialog class="auth-dialog" id="authDialog" aria-labelledby="authTitle">
-      <button class="dialog-close" id="authClose" type="button" aria-label="Close login dialog">×</button>
-      <p class="eyebrow">Member access / private archive</p>
-      <h2 id="authTitle">Keep your wall with you.</h2>
-      <p>Log in to sync approved edits, follow their live status, and continue your archive on another device.</p>
-      <button class="google-login" id="googleLogin" type="button"><span aria-hidden="true">G</span> Continue with Google</button>
-      <small id="authStatus" role="status" aria-live="polite">Google authentication will connect through Supabase.</small>
-    </dialog>
 
     <footer class="site-footer">
       <p>Alam’s Dump — locally restoring and styling photos since 2026.</p>

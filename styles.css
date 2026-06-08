@@ -1684,3 +1684,54 @@ summary:focus-visible,
 @media(max-width:920px){.wall-hanging{right:0;transform:scale(.82) rotate(3deg)}.tunnel-sticky{grid-template-columns:1fr;padding-top:7rem}.tunnel-copy{max-width:520px}.tunnel-scene{height:48vh}.tunnel-card{width:clamp(120px,26vw,190px)}}
 @media(max-width:560px){.wall-hanging{display:none}.tunnel-copy h2{font-size:3rem}.tunnel-scene{height:42vh}.tunnel-card{border-width:5px;padding:.6rem}.tunnel-card-a{left:0}.tunnel-card-b{left:35%}.tunnel-card-c{right:-5%}.tunnel-progress{right:.7rem}.login-trigger{padding:.48rem .65rem}}
 @media(prefers-reduced-motion:reduce){.wall-hanging{animation:none}.memory-tunnel{height:auto}.tunnel-sticky{position:relative}.tunnel-scene{transform:none}.reveal-on-scroll{opacity:1;transform:none}}
+
+/* Streamlined open wall: the dimensional treatment belongs to the wall, not a separate archive section. */
+.hero { padding-block: clamp(2.5rem, 6vw, 5rem); }
+.hero-stage { min-height: clamp(470px, 60vw, 650px); }
+.wall-rope {
+  position: absolute;
+  inset: 5% 0 auto;
+  z-index: 2;
+  width: 100%;
+  height: 45%;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, .65));
+}
+.wall-rope path { fill: none; stroke: #a98d5a; stroke-width: .45; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.living-photo::before {
+  position: absolute;
+  left: 50%;
+  top: -1.1rem;
+  z-index: 5;
+  width: .52rem;
+  height: 1.45rem;
+  border-radius: .18rem;
+  content: "";
+  background: linear-gradient(90deg, #9b7541, #e4c782 48%, #79582f);
+  box-shadow: 0 2px 4px rgba(0,0,0,.45);
+  transform: translateX(-50%) rotate(2deg) translateZ(20px);
+}
+.living-wall { transition: transform .5s ease; }
+.hero-stage:hover .living-wall { transform: rotateX(1.5deg) rotateY(-2deg); }
+#contactSheetCanvas[hidden] { display: none !important; }
+#contactSheetCanvas:not([hidden]) { margin-top: 1rem; }
+
+@media (max-width: 560px) {
+  .hero { padding-block: 2rem 1.5rem; gap: 1.5rem; }
+  .hero-stage { min-height: 455px; overflow: visible; padding-top: 2.5rem; }
+  .wall-hanging {
+    display: block;
+    right: -.25rem;
+    top: -1.25rem;
+    width: 88px;
+    height: 150px;
+    transform: scale(.7) rotate(3deg);
+    transform-origin: top right;
+  }
+  .hanging-banner { min-height: 112px; padding: .75rem .45rem; }
+  .hanging-banner strong { margin-top: .55rem; font-size: .72rem; }
+  .hanging-tassel { top: 147px; }
+  .living-wall { margin-top: .5rem; }
+  .wall-rope { top: 8%; }
+}

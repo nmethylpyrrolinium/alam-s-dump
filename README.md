@@ -9,21 +9,20 @@ A private-feeling browser photo lab for restoring and styling digital keepsakes.
 - Handheld shake, subject ghosting, and light trails while keeping the studio focused on single-photo treatments.
 - An Alam’s Dump timeline stamp by default, with name and date customization tucked behind the Timeline option.
 - Sharpness and noise-cancellation controls for cleaner restoration-focused edits.
-- Explicit consent before an edited image is added to the session-only hanging photo wall.
+- Explicit guest consent before an edited image is added to the open hanging photo wall; no login is required.
 - Local processing, JPEG download/share, recipes, remixable damage, and contact sheets.
 - Four single-photo modes: classic detail, RGB glitch, pixel dispersion, and neon noir.
 
-## Supabase wall: next steps
+## Public wall: next steps
 
-For a connector-ready, security-focused implementation request covering Google OAuth, live tracking, Realtime, Storage, and RLS, use [`SUPABASE_CONNECTOR_PROMPT.md`](SUPABASE_CONNECTOR_PROMPT.md).
+The browser interface lets every visitor approve and hang an edit without signing in. In the static demo, an approved photo appears immediately for the current visit. A deployed, cross-visitor public wall still needs an anonymous-safe storage/API connection.
 
-You already created a Supabase project. The interface now previews the complete signed-in Wall flow locally; connect it to Supabase next:
+When connecting Supabase or another backend:
 
-1. Enable Supabase Auth with email magic links or one-time passwords.
-2. Create `profiles`, `wall_photos`, `wall_reactions`, `wall_comments`, and `wall_likes` tables, plus a Storage bucket for approved image files.
-3. Add row-level security so anyone can read approved Wall entries, while feature, reaction, comment, like, and share records require `auth.uid()` and an existing profile.
-4. Require moderation approval on `wall_photos` before an uploaded photograph becomes public.
-5. Replace the local session profile and in-memory Wall actions in `app.js` with Supabase Auth, Storage uploads, and table reads/writes.
+1. Permit anonymous submissions through a narrowly scoped server function rather than exposing privileged credentials.
+2. Validate file type and size, strip metadata, rate-limit submissions, and store only processed wall images.
+3. Make approved wall images publicly readable while keeping all non-public uploads inaccessible.
+4. Load public wall entries into `featuredGallery` and preserve the immediate guest preview while publishing.
 
 ## Run locally
 

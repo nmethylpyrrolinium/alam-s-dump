@@ -212,10 +212,12 @@ function testMergedUiContract() {
   assert.doesNotMatch(html, /data-wall-action|profileForm|wallStatus/, 'living wall must stay free of social and profile controls');
   assert.match(html, /class="living-wall"/, 'the hero must contain the living wall');
   assert.match(html, /class="wall-hanging"/, 'the living wall must include its decorative hanging');
-  assert.match(html, /id="memoryTunnel"/, 'the page must include the scroll-driven 3D archive');
-  assert.match(html, /id="googleLogin"/, 'the header login flow must expose Google authentication');
-  assert.match(appSource, /signInWithOAuth/, 'Google authentication must retain its Supabase client hook');
-  assert.match(appSource, /requestAnimationFrame\(updateTunnel\)/, 'scroll depth updates must be animation-frame throttled');
+  assert.doesNotMatch(html, /id="memoryTunnel"|Walk through the archive/, 'the wall experience must not be split into a wasteful archive section');
+  assert.doesNotMatch(html, /id="googleLogin"|id="loginTrigger"/, 'hanging a photo must not require a login flow');
+  assert.match(html, /class="wall-rope"/, 'dimensional detail should be integrated into the existing wall as a hanging rope');
+  assert.match(html, /No login needed/, 'wall consent must clearly support guests');
+  assert.match(html, /id="contactSheetCanvas"[^>]*hidden/, 'the four-sheet canvas must be absent until requested');
+  assert.match(appSource, /setAttribute\('aria-expanded', 'true'\)/, 'making a four-sheet must reveal and announce its output');
   assert.match(appSource, /figure.className = 'living-photo photo-new'/, 'approved edits should join the living wall as animated photos');
   assert.match(appSource, /requestIdleCallback/, 'first-load editor work should be deferred until the browser is idle');
   assert.match(appSource, /IntersectionObserver/, 'expensive below-the-fold editor work should render lazily');
