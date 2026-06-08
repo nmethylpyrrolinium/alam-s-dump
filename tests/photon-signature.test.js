@@ -4,6 +4,8 @@ const {
   DEFAULT_PARAMS,
   applyPhotonPixels,
   applyArtifactPixels,
+  applyNeonNoirPixels,
+  applyGlitchPixels,
   getCrop,
   formatTimestamp,
   rgbToHsl,
@@ -161,6 +163,22 @@ function testAdvancedArtifacts() {
   assert.ok(a.data[rightEdge] >= source.data[rightEdge], 'spatial heat leak should preserve or add red energy near the right edge');
 }
 
+function testCreativePixelEffects() {
+  const source = makeImageData(18, 12, (x, y, width, height) => [30 + x * 8, 55 + y * 9, 90 + (width - x) * 5]);
+  const neon = cloneImageData(source);
+  applyNeonNoirPixels(neon, 0.8);
+  assert.notDeepEqual(neon.data, source.data, 'neon-noir grading must alter the image');
+  const shadow = 0;
+  assert.ok(neon.data[shadow + 2] > source.data[shadow + 2], 'neon-noir shadows should gain blue energy');
+
+  const glitchA = cloneImageData(source);
+  const glitchB = cloneImageData(source);
+  applyGlitchPixels(glitchA, 0.8, 0.5, 4242);
+  applyGlitchPixels(glitchB, 0.8, 0.5, 4242);
+  assert.deepEqual(glitchA.data, glitchB.data, 'seeded RGB glitches must be deterministic');
+  assert.notDeepEqual(glitchA.data, source.data, 'RGB glitch must split or displace source pixels');
+}
+
 function testImageFileValidation() {
   assert.equal(isSupportedImageFile({ type: 'image/jpeg' }), true, 'camera JPEGs should be accepted');
   assert.equal(isSupportedImageFile({ type: 'image/heic' }), true, 'browser-advertised image formats should reach the decoder');
@@ -199,6 +217,7 @@ testCropOptionsAndTimestamp();
 testHueRemapping();
 testDeterministicPhotonDamage();
 testAdvancedArtifacts();
+testCreativePixelEffects();
 testImageFileValidation();
 testMergedUiContract();
 testReferenceSignatureContract();

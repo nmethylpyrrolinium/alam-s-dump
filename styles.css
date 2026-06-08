@@ -1156,3 +1156,42 @@ input[type="range"] {
 .signature-panel[hidden] {
   display: none;
 }
+
+/* Creative compositing modes */
+.effect-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+.effect-grid button {
+  display: grid;
+  gap: 0.2rem;
+  min-height: 4.2rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: #dce8f7;
+  text-align: left;
+  cursor: pointer;
+}
+.effect-grid button small { color: var(--muted); line-height: 1.25; }
+.effect-grid button.active {
+  border-color: var(--cyan);
+  background: linear-gradient(135deg, rgba(84, 243, 255, 0.18), rgba(255, 69, 184, 0.08));
+  box-shadow: inset 0 0 0 1px rgba(84, 243, 255, 0.12);
+}
+.secondary-source {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding-top: 0.15rem;
+}
+.secondary-source input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.secondary-source small { color: var(--muted); line-height: 1.35; }
+.secondary-source.is-ready small { color: #8dffb0; }
+.effect-controls { margin-top: 0; }
+@media (max-width: 560px) {
+  .effect-grid { grid-template-columns: 1fr; }
+  .secondary-source { align-items: stretch; flex-direction: column; }
+}

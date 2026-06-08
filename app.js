@@ -423,6 +423,143 @@ function applyBloom(canvas, params) {
   ctx.restore();
 }
 
+function applyNeonNoirPixels(imageData, intensity = 0.7) {
+  const strength = clamp01(intensity);
+  const { data } = imageData;
+  for (let i = 0; i < data.length; i += 4) {
+    const lum = luma(data[i], data[i + 1], data[i + 2]) / 255;
+    const shadow = Math.pow(1 - lum, 1.8) * strength;
+    const highlight = Math.pow(lum, 2.1) * strength;
+    const greenSuppression = data[i + 1] > data[i] * 1.05 && data[i + 1] > data[i + 2] * 1.02 ? strength * 0.42 : 0;
+    data[i] = clamp255(data[i] * (1 - shadow * 0.25) + 238 * highlight * 0.42 + 92 * shadow * 0.2);
+    data[i + 1] = clamp255(data[i + 1] * (1 - greenSuppression) + 28 * shadow + 226 * highlight * 0.58);
+    data[i + 2] = clamp255(data[i + 2] + 172 * shadow * 0.64 + 255 * highlight * 0.34);
+  }
+  return imageData;
+}
+
+function applyGlitchPixels(imageData, intensity = 0.7, direction = 0.45, seed = 1) {
+  const { data, width, height } = imageData;
+  const source = new Uint8ClampedArray(data);
+  const rand = seededRandom(seed);
+  const shift = Math.max(1, Math.round((3 + Math.abs(direction) * 10) * clamp01(intensity)));
+  const sign = direction < 0 ? -1 : 1;
+  const tears = Array.from({ length: Math.max(1, Math.round(3 + intensity * 12)) }, () => ({
+    y: Math.floor(rand() * height), h: 1 + Math.floor(rand() * Math.max(2, height * 0.035)), dx: Math.round((rand() - 0.5) * width * intensity * 0.3),
+  }));
+  for (let y = 0; y < height; y += 1) {
+    const tear = tears.find((item) => y >= item.y && y < item.y + item.h);
+    for (let x = 0; x < width; x += 1) {
+      const out = (y * width + x) * 4;
+      const baseX = clamp(x + (tear?.dx || 0), 0, width - 1);
+      data[out] = source[(y * width + clamp(baseX + shift * sign, 0, width - 1)) * 4];
+      data[out + 1] = source[(y * width + baseX) * 4 + 1];
+      data[out + 2] = source[(y * width + clamp(baseX - shift * sign, 0, width - 1)) * 4 + 2];
+    }
+  }
+  return imageData;
+}
+
+function drawCover(ctx, source, width, height) {
+  const sourceWidth = source.naturalWidth || source.width || source.videoWidth;
+  const sourceHeight = source.naturalHeight || source.height || source.videoHeight;
+  const crop = getCrop(sourceWidth, sourceHeight, width / height, 0.5);
+  ctx.drawImage(source, crop.sx, crop.sy, crop.sw, crop.sh, 0, 0, width, height);
+}
+
+function applyCreativeEffect(canvas, params, seed = 1) {
+  const mode = params.effectMode || 'classic';
+  if (mode === 'classic') return;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  const width = canvas.width;
+  const height = canvas.height;
+  const intensity = clamp01(params.effectIntensity ?? 0.68);
+  const direction = clamp(params.effectDirection ?? 0.45, -1, 1);
+  const scale = params.effectScale ?? 0.86;
+  const softness = clamp01(params.effectSoftness ?? 0.35);
+  const secondary = params.secondarySource;
+
+  if (mode === 'neonNoir') {
+    ctx.putImageData(applyNeonNoirPixels(ctx.getImageData(0, 0, width, height), intensity), 0, 0);
+    applyBloom(canvas, { bloomThreshold: 0.58, bloomRadius: 8 + intensity * 9, bloomStrength: 0.18 + intensity * 0.32 });
+    return;
+  }
+  if (mode === 'glitch') {
+    ctx.putImageData(applyGlitchPixels(ctx.getImageData(0, 0, width, height), intensity, direction, seed), 0, 0);
+    return;
+  }
+  if (mode === 'dispersion') {
+    const copy = document.createElement('canvas'); copy.width = width; copy.height = height;
+    copy.getContext('2d').drawImage(canvas, 0, 0);
+    const rand = seededRandom(seed);
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    for (let i = 0; i < 90 * intensity; i += 1) {
+      const x = width * (0.5 + rand() * 0.5);
+      const y = height * (0.12 + rand() * 0.76);
+      const size = 2 + rand() * 9 * intensity;
+      ctx.globalAlpha = 0.22 + rand() * 0.65;
+      ctx.fillRect(x, y, size, size);
+    }
+    ctx.restore();
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    for (let i = 0; i < 150 * intensity; i += 1) {
+      const sx = Math.floor(width * (0.55 + rand() * 0.42));
+      const sy = Math.floor(height * (0.12 + rand() * 0.76));
+      const size = 1 + rand() * (3 + intensity * 7);
+      const travel = (18 + rand() * width * 0.42 * intensity) * (direction < 0 ? -1 : 1);
+      ctx.globalAlpha = 0.18 + rand() * 0.72;
+      ctx.drawImage(copy, sx, sy, size, size, sx + travel, sy + (rand() - 0.5) * 60 * intensity, size, size);
+    }
+    ctx.restore();
+    return;
+  }
+  if (!secondary) return;
+
+  const layer = document.createElement('canvas'); layer.width = width; layer.height = height;
+  const layerCtx = layer.getContext('2d');
+  drawCover(layerCtx, secondary, width, height);
+
+  if (mode === 'doubleExposure') {
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = 0.25 + intensity * 0.65;
+    ctx.filter = `contrast(${1.05 + intensity * 0.65}) saturate(${0.65 + intensity * 0.55})`;
+    ctx.translate(direction * width * 0.08, 0);
+    ctx.drawImage(layer, 0, 0, width, height);
+    ctx.restore();
+  } else if (mode === 'surreal') {
+    const objectWidth = width * 0.62 * scale;
+    const objectHeight = height * 0.48 * scale;
+    const x = width * 0.5 - objectWidth * 0.5 + direction * width * 0.18;
+    const y = height * 0.42 - objectHeight * 0.5;
+    ctx.save();
+    ctx.globalAlpha = 0.24 + intensity * 0.3;
+    ctx.filter = `blur(${8 + softness * 20}px)`;
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.ellipse(x + objectWidth * 0.5, y + objectHeight * 1.08, objectWidth * 0.42, objectHeight * 0.11, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.beginPath(); ctx.ellipse(x + objectWidth / 2, y + objectHeight / 2, objectWidth / 2, objectHeight / 2, direction * 0.2, 0, Math.PI * 2); ctx.clip();
+    ctx.globalAlpha = 0.45 + intensity * 0.55;
+    ctx.filter = `saturate(${1 + intensity}) contrast(${1 + intensity * 0.35})`;
+    ctx.drawImage(layer, x, y, objectWidth, objectHeight);
+    ctx.restore();
+    ctx.save(); ctx.strokeStyle = `rgba(84,243,255,${0.2 + intensity * 0.55})`; ctx.lineWidth = 2 + intensity * 5;
+    ctx.beginPath(); ctx.ellipse(x + objectWidth / 2, y + objectHeight / 2, objectWidth / 2, objectHeight / 2, direction * 0.2, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+  } else if (mode === 'levitation') {
+    const original = document.createElement('canvas'); original.width = width; original.height = height; original.getContext('2d').drawImage(canvas, 0, 0);
+    ctx.save(); ctx.globalAlpha = 0.72 + intensity * 0.28; ctx.drawImage(layer, 0, 0); ctx.restore();
+    const subjectWidth = width * 0.62 * scale; const subjectHeight = height * 0.72 * scale;
+    const x = width / 2 - subjectWidth / 2 + direction * width * 0.12; const y = height * 0.42 - subjectHeight / 2;
+    ctx.save(); ctx.beginPath(); ctx.ellipse(x + subjectWidth / 2, y + subjectHeight / 2, subjectWidth / 2, subjectHeight / 2, 0, 0, Math.PI * 2); ctx.clip();
+    ctx.filter = `blur(${softness * 1.5}px)`; ctx.drawImage(original, x, y - height * intensity * 0.08, subjectWidth, subjectHeight); ctx.restore();
+    ctx.save(); ctx.globalAlpha = 0.18 + intensity * 0.18; ctx.filter = `blur(${10 + softness * 24}px)`; ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.ellipse(width / 2 + direction * width * 0.1, height * 0.83, subjectWidth * 0.35, height * 0.025, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  }
+}
+
 function renderSourceToCanvas(source, canvas, params = DEFAULT_PARAMS, seed = 20260516) {
   const outputWidth = canvas.width;
   const outputHeight = canvas.height;
@@ -453,6 +590,7 @@ function renderSourceToCanvas(source, canvas, params = DEFAULT_PARAMS, seed = 20
   applyMotionDamage(canvas, params.motionStyle, params.motionAmount, seed + 17);
   const artifactData = outputContext.getImageData(0, 0, outputWidth, outputHeight);
   outputContext.putImageData(applyArtifactPixels(artifactData, params, seed + 31), 0, 0);
+  applyCreativeEffect(canvas, params, seed + 47);
   drawTimestamp(canvas, params.timestampDate ? new Date(params.timestampDate) : new Date());
 }
 
@@ -622,6 +760,11 @@ function currentParams() {
     cropPosition: Number(document.getElementById('cropPositionControl')?.value || DEFAULT_PARAMS.cropPosition),
     motionStyle: document.querySelector('[data-motion].active')?.dataset.motion || DEFAULT_PARAMS.motionStyle,
     motionAmount: Number(document.getElementById('motionControl')?.value || DEFAULT_PARAMS.motionAmount),
+    effectMode: document.querySelector('[data-effect].active')?.dataset.effect || 'classic',
+    effectIntensity: Number(document.getElementById('effectIntensityControl')?.value || 0.68),
+    effectDirection: Number(document.getElementById('effectDirectionControl')?.value || 0.45),
+    effectScale: Number(document.getElementById('effectScaleControl')?.value || 0.86),
+    effectSoftness: Number(document.getElementById('effectSoftnessControl')?.value || 0.35),
     timestampDate: document.getElementById('timestampNow')?.checked ? null : document.getElementById('customTimestamp')?.value || null,
   };
 }
@@ -653,6 +796,8 @@ function initialize() {
   let hasUserImage = false;
   let loadRequestId = 0;
   let activeObjectUrl = null;
+  let activeSecondarySource = null;
+  let secondaryObjectUrl = null;
 
   const setStatus = (message, state = '') => {
     if (!uploadStatus) return;
@@ -675,7 +820,7 @@ function initialize() {
   };
 
   const renderOutput = () => {
-    const params = currentParams();
+    const params = { ...currentParams(), secondarySource: activeSecondarySource };
     resizeEditorCanvases(params);
     renderRawPreview(activeSource, sourcePreviewCanvas, params);
     renderSourceToCanvas(activeSource, outputCanvas, params, renderSeed);
@@ -744,13 +889,36 @@ function initialize() {
     image.src = url;
   };
 
+  const loadSecondaryImage = (file) => {
+    if (!file) return;
+    if (!isSupportedImageFile(file)) {
+      setStatus('The second layer must be a browser-supported image.', 'error');
+      return;
+    }
+    if (secondaryObjectUrl) URL.revokeObjectURL(secondaryObjectUrl);
+    const url = URL.createObjectURL(file);
+    secondaryObjectUrl = url;
+    const image = new Image();
+    image.decoding = 'async';
+    image.onload = () => {
+      activeSecondarySource = image;
+      document.getElementById('secondarySource')?.classList.add('is-ready');
+      const hint = document.getElementById('secondaryHint');
+      if (hint) hint.textContent = `${file.name || 'Second image'} ready as the composite layer.`;
+      renderUserEdit();
+      setStatus('Second image loaded. Choose Surreal, Double exposure, or Levitation to combine it.', 'success');
+    };
+    image.onerror = () => setStatus('The second image could not be decoded.', 'error');
+    image.src = url;
+  };
+
   renderAll();
 
-  ['contrastControl', 'grainControl', 'cyanControl', 'ditherControl', 'aberrationControl', 'scanlineControl', 'dustControl', 'leakControl', 'cropPositionControl', 'motionControl'].forEach((id) => {
+  ['contrastControl', 'grainControl', 'cyanControl', 'ditherControl', 'aberrationControl', 'scanlineControl', 'dustControl', 'leakControl', 'cropPositionControl', 'motionControl', 'effectIntensityControl', 'effectDirectionControl', 'effectScaleControl', 'effectSoftnessControl'].forEach((id) => {
     document.getElementById(id)?.addEventListener('input', renderUserEdit);
   });
 
-  ['crop', 'motion'].forEach((kind) => {
+  ['crop', 'motion', 'effect'].forEach((kind) => {
     document.querySelectorAll(`[data-${kind}]`).forEach((button) => {
       button.addEventListener('click', () => {
         document.querySelectorAll(`[data-${kind}]`).forEach((item) => item.classList.toggle('active', item === button));
@@ -778,6 +946,11 @@ function initialize() {
       loadImageFile(event.target.files?.[0]);
       event.target.value = '';
     });
+  });
+
+  document.getElementById('secondaryImageInput')?.addEventListener('change', (event) => {
+    loadSecondaryImage(event.target.files?.[0]);
+    event.target.value = '';
   });
 
   ['dragenter', 'dragover'].forEach((eventName) => {
@@ -924,6 +1097,8 @@ if (typeof module !== 'undefined') {
     formatTimestamp,
     applyPhotonPixels,
     applyArtifactPixels,
+    applyNeonNoirPixels,
+    applyGlitchPixels,
     unsharpMask,
     imageSignature,
     scoreSignature,
