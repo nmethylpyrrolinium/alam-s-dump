@@ -211,6 +211,11 @@ function testMergedUiContract() {
   assert.doesNotMatch(html, /surreal|doubleExposure|levitation/i, 'removed composite templates must stay out of the UI contract');
   assert.doesNotMatch(html, /data-wall-action|profileForm|wallStatus/, 'living wall must stay free of social and profile controls');
   assert.match(html, /class="living-wall"/, 'the hero must contain the living wall');
+  assert.match(html, /class="wall-hanging"/, 'the living wall must include its decorative hanging');
+  assert.match(html, /id="memoryTunnel"/, 'the page must include the scroll-driven 3D archive');
+  assert.match(html, /id="googleLogin"/, 'the header login flow must expose Google authentication');
+  assert.match(appSource, /signInWithOAuth/, 'Google authentication must retain its Supabase client hook');
+  assert.match(appSource, /requestAnimationFrame\(updateTunnel\)/, 'scroll depth updates must be animation-frame throttled');
   assert.match(appSource, /figure.className = 'living-photo photo-new'/, 'approved edits should join the living wall as animated photos');
   assert.match(appSource, /requestIdleCallback/, 'first-load editor work should be deferred until the browser is idle');
   assert.match(appSource, /IntersectionObserver/, 'expensive below-the-fold editor work should render lazily');
