@@ -10,6 +10,8 @@ A rare 3D landing page and browser-based forensic camera aesthetic engine. The a
 - Current local-time timestamps by default, with an optional custom date and time.
 - Explicit consent before an edited image is added to the session-only hanging photo wall.
 - Local processing, JPEG download/share, recipes, remixable damage, and contact sheets.
+- Seven creative modes: classic damage, surreal composite, double exposure, RGB glitch, particle dispersion, neon noir, and clean-plate levitation.
+- Optional second-image layer for composite modes, with intensity, direction, scale, and mask-softness controls.
 
 ## Run locally
 

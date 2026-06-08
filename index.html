@@ -135,6 +135,29 @@
             </div>
             <ul id="signatureReport"></ul>
           </div>
+          <div class="tool-section effect-studio">
+            <span class="tool-label">Creative mode</span>
+            <div class="effect-grid" id="effectRail" aria-label="Creative effect mode">
+              <button class="active" type="button" data-effect="classic"><strong>Classic damage</strong><small>Original photon treatment</small></button>
+              <button type="button" data-effect="surreal"><strong>Surreal composite</strong><small>Dreamlike portal overlay</small></button>
+              <button type="button" data-effect="doubleExposure"><strong>Double exposure</strong><small>Portrait + texture blend</small></button>
+              <button type="button" data-effect="glitch"><strong>RGB glitch</strong><small>Channel split + signal tears</small></button>
+              <button type="button" data-effect="dispersion"><strong>Dispersion</strong><small>Directional particle shatter</small></button>
+              <button type="button" data-effect="neonNoir"><strong>Neon noir</strong><small>Cyan / magenta night grade</small></button>
+              <button type="button" data-effect="levitation"><strong>Levitation</strong><small>Clean-plate floating composite</small></button>
+            </div>
+            <div class="secondary-source" id="secondarySource">
+              <input id="secondaryImageInput" type="file" accept="image/*" />
+              <label class="upload-button" for="secondaryImageInput">Add second image</label>
+              <small id="secondaryHint">Used by surreal composite, double exposure, and levitation.</small>
+            </div>
+            <div class="control-grid effect-controls">
+              <label>Effect intensity<input id="effectIntensityControl" type="range" min="0" max="1" step="0.01" value="0.68" /></label>
+              <label>Direction / offset<input id="effectDirectionControl" type="range" min="-1" max="1" step="0.01" value="0.45" /></label>
+              <label>Overlay scale<input id="effectScaleControl" type="range" min="0.35" max="1.6" step="0.01" value="0.86" /></label>
+              <label>Mask softness<input id="effectSoftnessControl" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
+            </div>
+          </div>
           <div class="tool-section">
             <span class="tool-label">Crop</span>
             <div class="choice-rail" id="cropRail" aria-label="Crop ratio">
