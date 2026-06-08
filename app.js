@@ -1007,6 +1007,7 @@ function initialize() {
     const sheet = document.getElementById('contactSheetCanvas');
     const sheetContext = sheet.getContext('2d');
     sheet.hidden = false;
+    document.getElementById('contactSheetButton')?.setAttribute('aria-expanded', 'true');
     sheetContext.fillStyle = '#05070d';
     sheetContext.fillRect(0, 0, sheet.width, sheet.height);
     Object.entries(presets).forEach(([name, overrides], index) => {
@@ -1065,7 +1066,7 @@ function initialize() {
     figure.append(image, caption);
     gallery?.append(figure);
     document.getElementById('featureAsk').hidden = true;
-    setStatus('Added to the living wall for this session.', 'success');
+    setStatus('Approved and hanging on the open wall. No login needed.', 'success');
     document.getElementById('wall')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
@@ -1073,24 +1074,6 @@ function initialize() {
     document.getElementById('featureAsk').hidden = true;
     setStatus('Kept private.', 'success');
   });
-
-  // Scroll-driven depth uses one animation-frame update, avoiding a render on every scroll event.
-  const memoryTunnel = document.getElementById('memoryTunnel');
-  let tunnelFrame = 0;
-  const updateTunnel = () => {
-    tunnelFrame = 0;
-    if (!memoryTunnel) return;
-    const rect = memoryTunnel.getBoundingClientRect();
-    const travel = Math.max(1, memoryTunnel.offsetHeight - window.innerHeight);
-    const progress = Math.min(1, Math.max(0, -rect.top / travel));
-    memoryTunnel.style.setProperty('--tunnel-progress', progress.toFixed(3));
-  };
-  const requestTunnelUpdate = () => {
-    if (!tunnelFrame) tunnelFrame = window.requestAnimationFrame(updateTunnel);
-  };
-  window.addEventListener('scroll', requestTunnelUpdate, { passive: true });
-  window.addEventListener('resize', requestTunnelUpdate, { passive: true });
-  updateTunnel();
 
   const reveals = document.querySelectorAll('.reveal-on-scroll');
   if ('IntersectionObserver' in window) {
@@ -1107,26 +1090,7 @@ function initialize() {
     reveals.forEach((element) => element.classList.add('is-visible'));
   }
 
-  const authDialog = document.getElementById('authDialog');
-  const authStatus = document.getElementById('authStatus');
-  document.getElementById('loginTrigger')?.addEventListener('click', () => authDialog?.showModal());
-  document.getElementById('authClose')?.addEventListener('click', () => authDialog?.close());
-  authDialog?.addEventListener('click', (event) => {
-    if (event.target === authDialog) authDialog.close();
-  });
-  document.getElementById('googleLogin')?.addEventListener('click', async () => {
-    const supabase = window.supabaseClient;
-    if (!supabase?.auth?.signInWithOAuth) {
-      authStatus.textContent = 'Setup mode: connect window.supabaseClient, then Google sign-in is ready.';
-      return;
-    }
-    authStatus.textContent = 'Opening Google sign-in…';
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin },
-    });
-    if (error) authStatus.textContent = `Could not start sign-in: ${error.message}`;
-  });
+  // The open wall deliberately needs no account or archive detour.
 
 }
 
