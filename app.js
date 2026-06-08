@@ -279,6 +279,13 @@ async function signOut() {
   return supabaseClient.auth.signOut();
 }
 
+async function getAuthSession() {
+  if (!supabaseClient) return null;
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error) throw error;
+  return data.session || null;
+}
+
 async function getCurrentUser() {
   if (!supabaseClient) return null;
   const { data, error } = await supabaseClient.auth.getUser();
@@ -293,26 +300,20 @@ async function getCurrentProfile(userId) {
   return data;
 }
 
-async function isCurrentUserAdmin() {
-  const user = await getCurrentUser();
-  if (!user) return { user: null, profile: null, isAdmin: false };
-  const profile = await getCurrentProfile(user.id);
-  return { user, profile, isAdmin: profile?.account_type === 'admin' };
-}
-
 async function signInAdmin() {
   if (!supabaseClient) throw new Error('Supabase is unavailable.');
   return supabaseClient.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: `${window.location.origin}${window.location.pathname}#admin` },
+    options: { redirectTo: window.location.origin + window.location.pathname + '#admin' },
   });
 }
 
 async function signOutAdmin() {
-  await signOut();
+  if (!supabaseClient) return;
+  await supabaseClient.auth.signOut();
   activeAdminUser = null;
   activeAdminPhotos = [];
-  await renderAdminRoute();
+  window.location.hash = '';
 }
 
 function escapeHtml(value) {
@@ -342,6 +343,12 @@ function renderAdminMessage(title, message, state = '') {
   const view = document.getElementById('adminView');
   if (!view) return;
   view.innerHTML = `<div class="admin-auth"><p class="eyebrow">Hidden control room</p><h1>${escapeHtml(title)}</h1><p>${escapeHtml(message)}</p><p class="admin-feedback" data-state="${state}"></p><button type="button" data-admin-back>Back to public wall</button></div>`;
+}
+
+function renderAdminLogin() {
+  const view = document.getElementById('adminView');
+  if (!view) return;
+  view.innerHTML = `<div class="admin-auth"><p class="eyebrow">Hidden control room</p><h1>Alam’s Dump Admin</h1><p>Sign in with an authorized Google account to continue.</p><p class="admin-feedback" role="status"></p><button type="button" data-admin-login>Login with Google</button><button type="button" data-admin-back>Back to public wall</button></div>`;
 }
 
 function adminCard(photo) {
@@ -482,22 +489,23 @@ async function renderAdminRoute() {
     return;
   }
   try {
-    const { user, profile, isAdmin } = await isCurrentUserAdmin();
-    if (!user) {
-      renderAdminMessage('Alam’s Dump Admin', 'Sign in with the Google account configured in Supabase Auth.');
-      const box = view.querySelector('.admin-auth');
-      const login = document.createElement('button');
-      login.type = 'button'; login.textContent = 'Continue with Google'; login.dataset.adminLogin = '';
-      box.insertBefore(login, box.querySelector('[data-admin-back]'));
+    const session = await getAuthSession();
+    if (!session) {
+      activeAdminUser = null;
+      activeAdminPhotos = [];
+      renderAdminLogin();
       return;
     }
-    if (!profile) { renderAdminMessage('Profile missing', 'Your authenticated account does not have a public.profiles row.', 'error'); return; }
-    if (!isAdmin) { renderAdminMessage('Not authorized.', 'This account is signed in but is not an admin.', 'error'); return; }
+
+    const user = await getCurrentUser();
+    const profile = user ? await getCurrentProfile(user.id) : null;
+    if (!profile) { renderAdminMessage('Profile missing', 'Profile missing. Try refreshing or contact admin.', 'error'); return; }
+    if (profile.account_type !== 'admin') { renderAdminMessage('Not authorized', 'Not authorized', 'error'); return; }
     activeAdminUser = user;
     renderAdminDashboard(user, profile);
     await loadAdminPhotos();
   } catch (error) {
-    renderAdminMessage('Session expired or unavailable', friendlyError(error, 'Could not verify admin access.'), 'error');
+    renderAdminMessage('Unable to verify access', friendlyError(error, 'Could not verify admin access.'), 'error');
   }
 }
 
