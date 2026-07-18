@@ -16,6 +16,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="layout-v2.css" />
   </head>
   <body>
     <section class="admin-shell" id="adminView" hidden aria-live="polite"></section>
@@ -37,14 +38,15 @@
         <a href="#wall">Wall</a>
         <a href="#lab">Hang a photo</a>
       </nav>
+      <button class="header-new-photo" id="newPhotoButton" type="button">New photo</button>
     </header>
 
     <main id="top">
       <section class="hero section-shell">
         <div class="hero-copy">
           <p class="eyebrow">ALAM’S DUMP / 2026</p>
-          <h1>Photos look better with detail.</h1>
-          <p class="lede">Crop. Clean noise. Sharpen. Sign it.</p>
+          <h1>Restore. Damage. Export.</h1>
+          <p class="lede">A private photo lab that runs entirely in your browser.</p>
           <div class="hero-actions">
             <a class="button primary" href="#lab">Edit a photo</a>
             <a class="button ghost" href="#wall">See the wall</a>
@@ -93,15 +95,14 @@
         </div>
       </section>
 
-      <section class="lab section-shell reveal-on-scroll" id="lab">
+      <section class="lab lab--v2 section-shell reveal-on-scroll" id="lab">
         <div class="lab-copy">
           <p class="eyebrow">Live browser implementation</p>
           <h2>Pick a photo. Restore it locally. Keep the evidence.</h2>
           <p>
-            Use the controls to stress the forensic parameters. Processing uses
-            Canvas ImageData, deterministic grain, HSL hue remapping, a shaped
-            tone LUT, ordered dither, bloom, adjustable sharpness, noise cancellation, and a timestamp
-            compositor.
+            Processing uses Canvas ImageData, deterministic grain, HSL hue
+            remapping, a shaped tone LUT, ordered dither, bloom, and a
+            timestamp compositor — all on-device.
           </p>
           <div class="file-drop" id="dropZone">
             <input id="imageInput" type="file" accept="image/*" />
@@ -126,93 +127,183 @@
               <button id="downloadButton" type="button">Download JPEG</button>
             </div>
           </div>
-          <div class="canvas-compare" aria-label="Source image and filtered photon output comparison">
-            <figure>
-              <canvas id="sourceCanvas" width="410" height="547"></canvas>
-              <figcaption>before</figcaption>
-            </figure>
-            <figure>
-              <canvas id="outputCanvas" width="410" height="547"></canvas>
-              <figcaption>after</figcaption>
-            </figure>
-          </div>
-          <div class="signature-panel" aria-live="polite" hidden>
-            <div>
-              <span class="eyebrow">Automated image comparison</span>
-              <strong id="signatureVerdict">Waiting for render…</strong>
+
+          <div class="lab-topbar">
+            <div class="lab-search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input id="labSearchInput" type="search" placeholder="Search controls…" aria-label="Search editor controls" />
             </div>
-            <ul id="signatureReport"></ul>
+            <span class="lab-topbar-hint">Type to jump to a control</span>
           </div>
-          <div class="tool-section effect-studio">
-            <span class="tool-label">Creative mode</span>
-            <div class="effect-grid" id="effectRail" aria-label="Creative effect mode">
-              <button class="active" type="button" data-effect="classic"><strong>Classic detail</strong><small>Clean restoration base</small></button>
-              <button type="button" data-effect="glitch"><strong>RGB glitch</strong><small>Channel split + signal tears</small></button>
-              <button type="button" data-effect="dispersion"><strong>Pixel dispersion</strong><small>Directional sensor breakup</small></button>
-              <button type="button" data-effect="neonNoir"><strong>Neon noir</strong><small>Cyan / magenta night grade</small></button>
+
+          <div class="lab-shell">
+            <nav class="lab-sidebar" aria-label="Effect categories">
+              <button class="category-nav-item" type="button" data-category-nav="essentials">Essentials</button>
+              <button class="category-nav-item" type="button" data-category-nav="film">Film Cameras</button>
+              <button class="category-nav-item" type="button" data-category-nav="pixel">Pixel &amp; Digital</button>
+              <button class="category-nav-item" type="button" data-category-nav="print">Print &amp; Analog</button>
+              <button class="category-nav-item" type="button" data-category-nav="retro">Retro &amp; CRT</button>
+              <button class="category-nav-item" type="button" data-category-nav="artistic">Artistic</button>
+              <button class="category-nav-item" type="button" data-category-nav="color">Color &amp; Tone</button>
+              <button class="category-nav-item" type="button" data-category-nav="export">Export</button>
+            </nav>
+
+            <div class="lab-center">
+              <div class="preview-stage-controls">
+                <div class="stage-group">
+                  <button type="button" class="active" data-zoom="fit">Fit</button>
+                  <button type="button" data-zoom="100">100%</button>
+                  <button id="resetViewButton" type="button">Reset view</button>
+                </div>
+                <div class="stage-group">
+                  <button id="compareToggleButton" type="button">Before / after</button>
+                </div>
+              </div>
+              <div class="preview-viewport">
+                <div class="canvas-compare" aria-label="Source image and filtered photon output comparison">
+                  <figure data-role="before">
+                    <canvas id="sourceCanvas" width="410" height="547"></canvas>
+                    <figcaption>before</figcaption>
+                  </figure>
+                  <figure data-role="after">
+                    <canvas id="outputCanvas" width="410" height="547"></canvas>
+                    <figcaption>after</figcaption>
+                  </figure>
+                </div>
+              </div>
             </div>
-            <div class="control-grid effect-controls">
-              <label>Effect intensity<input id="effectIntensityControl" type="range" min="0" max="1" step="0.01" value="0.68" /></label>
-              <label>Direction / offset<input id="effectDirectionControl" type="range" min="-1" max="1" step="0.01" value="0.45" /></label>
+
+            <div class="lab-context" id="labContext">
+              <div data-category="essentials" hidden>
+                <p class="category-panel-title">Essentials</p>
+                <div class="tool-section">
+                  <span class="tool-label" data-search-label="Crop">Crop</span>
+                  <div class="choice-rail" id="cropRail" aria-label="Crop ratio">
+                    <button class="active" type="button" data-crop="0.75">3:4</button>
+                    <button type="button" data-crop="1">Square</button>
+                    <button type="button" data-crop="0.5625">Story</button>
+                    <button type="button" data-crop="1.333333">4:3</button>
+                    <button type="button" data-crop="original">Original</button>
+                  </div>
+                  <label class="inline-range">Position <input id="cropPositionControl" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                </div>
+                <div class="control-grid">
+                  <label data-search-label="Noise cancellation">Noise cancellation<input id="noiseCancelControl" type="range" min="0" max="1" step="0.01" value="0.48" /></label>
+                  <label data-search-label="Sharpness">Sharpness<input id="sharpnessControl" type="range" min="0" max="1.6" step="0.01" value="0.78" /></label>
+                  <label data-search-label="Contrast">Contrast<input id="contrastControl" type="range" min="1" max="1.8" step="0.01" value="1.38" /></label>
+                </div>
+                <details class="tool-section timestamp-tool">
+                  <summary><span><span class="tool-label" data-search-label="Timestamp">Timeline</span><strong>Alam’s Dump stamp</strong></span><small>Customize name &amp; date</small></summary>
+                  <div class="timeline-options">
+                    <label>Stamp name<input id="stampNameControl" type="text" maxlength="32" placeholder="Alam’s Dump" value="Alam’s Dump" /></label>
+                    <small>Keep Alam’s Dump as-is, or replace it with your own name.</small>
+                    <label class="toggle-line"><input id="timestampNow" type="checkbox" checked /> Use my current local time</label>
+                    <input id="customTimestamp" type="datetime-local" disabled aria-label="Custom timestamp" />
+                  </div>
+                </details>
+              </div>
+
+              <div data-category="film" hidden>
+                <p class="category-panel-title">Recipes</p>
+                <div class="preset-rail" aria-label="Effect recipes">
+                  <button class="active" type="button" data-preset="reference">Reference</button>
+                  <button type="button" data-preset="night">Night signal</button>
+                  <button type="button" data-preset="heat">Heat leak</button>
+                  <button type="button" data-preset="hardSensor">Hard sensor</button>
+                </div>
+                <div class="control-grid">
+                  <label data-search-label="Grain">Grain<input id="grainControl" type="range" min="0" max="32" step="1" value="17" /></label>
+                  <label data-search-label="Heat leak">Heat leak<input id="leakControl" type="range" min="0" max="0.5" step="0.01" value="0.08" /></label>
+                </div>
+                <p class="category-empty-state">Named film stocks (Portra, Ektar, Tri-X, Cinestill, and the rest) land with the next update — the recipes above are the current stand-ins.</p>
+              </div>
+
+              <div data-category="pixel" hidden>
+                <p class="category-panel-title">Pixel &amp; Digital</p>
+                <p class="category-empty-state">8-bit, pixel mosaic, LCD pixel, and nearest-neighbor upscale effects are landing in the next update.</p>
+              </div>
+
+              <div data-category="print" hidden>
+                <p class="category-panel-title">Print &amp; Analog</p>
+                <p class="category-empty-state">Halftone, risograph, newspaper print, and CMYK effects are landing in the next update.</p>
+              </div>
+
+              <div data-category="retro" hidden>
+                <p class="category-panel-title">Retro &amp; CRT</p>
+                <div class="tool-section">
+                  <span class="tool-label" data-search-label="Motion">Motion</span>
+                  <div class="choice-rail" id="motionRail" aria-label="Motion damage">
+                    <button class="active" type="button" data-motion="still">Still</button>
+                    <button type="button" data-motion="shake">Shake</button>
+                    <button type="button" data-motion="ghost">Ghost</button>
+                    <button type="button" data-motion="trails">Trails</button>
+                  </div>
+                  <label class="inline-range">Amount <input id="motionControl" type="range" min="0" max="1" step="0.01" value="0.45" /></label>
+                </div>
+                <div class="control-grid">
+                  <label data-search-label="Dither">Dither<input id="ditherControl" type="range" min="0" max="14" step="1" value="7" /></label>
+                  <label data-search-label="Scan field">Scan field<input id="scanlineControl" type="range" min="0" max="0.2" step="0.01" value="0.055" /></label>
+                </div>
+              </div>
+
+              <div data-category="artistic" hidden>
+                <p class="category-panel-title">Artistic &amp; Distortion</p>
+                <div class="tool-section effect-studio">
+                  <span class="tool-label" data-search-label="Creative mode">Creative mode</span>
+                  <div class="effect-grid" id="effectRail" aria-label="Creative effect mode">
+                    <button class="active" type="button" data-effect="classic"><strong>Classic detail</strong><small>Clean restoration base</small></button>
+                    <button type="button" data-effect="glitch"><strong>RGB glitch</strong><small>Channel split + signal tears</small></button>
+                    <button type="button" data-effect="dispersion"><strong>Pixel dispersion</strong><small>Directional sensor breakup</small></button>
+                    <button type="button" data-effect="neonNoir"><strong>Neon noir</strong><small>Cyan / magenta night grade</small></button>
+                  </div>
+                  <div class="control-grid effect-controls">
+                    <label>Effect intensity<input id="effectIntensityControl" type="range" min="0" max="1" step="0.01" value="0.68" /></label>
+                    <label>Direction / offset<input id="effectDirectionControl" type="range" min="-1" max="1" step="0.01" value="0.45" /></label>
+                  </div>
+                </div>
+                <div class="control-grid">
+                  <label data-search-label="Prism split">Prism split<input id="aberrationControl" type="range" min="0" max="5" step="0.25" value="1.25" /></label>
+                  <label data-search-label="Sensor dust">Sensor dust<input id="dustControl" type="range" min="0" max="0.12" step="0.005" value="0.018" /></label>
+                </div>
+              </div>
+
+              <div data-category="color" hidden>
+                <p class="category-panel-title">Color &amp; Tone</p>
+                <div class="control-grid">
+                  <label data-search-label="Cyan shadow">Cyan shadow<input id="cyanControl" type="range" min="0" max="0.16" step="0.005" value="0.075" /></label>
+                </div>
+                <p class="category-empty-state">Full HSL, curves, levels, and white balance land with the Color &amp; Tone update.</p>
+              </div>
+
+              <div data-category="export" hidden>
+                <p class="category-panel-title">Export</p>
+                <p class="category-empty-state">PNG/WEBP export, a quality slider, and a metadata toggle land with the Export update. JPEG export works today from the buttons above the canvas.</p>
+                <details class="export-optional">
+                  <summary>Compare four versions</summary>
+                  <div class="contact-sheet-tool">
+                    <div><strong>Compare four versions</strong><small>No sheet space is reserved until you make one.</small></div>
+                    <button id="contactSheetButton" type="button" aria-expanded="false" aria-controls="contactSheetCanvas">Make 4-sheet</button>
+                  </div>
+                  <canvas id="contactSheetCanvas" width="880" height="1200" hidden></canvas>
+                </details>
+                <details class="export-optional">
+                  <summary>Diagnostics</summary>
+                  <div class="signature-panel" aria-live="polite">
+                    <div>
+                      <span class="eyebrow">Automated image comparison</span>
+                      <strong id="signatureVerdict">Waiting for render…</strong>
+                    </div>
+                    <ul id="signatureReport"></ul>
+                  </div>
+                </details>
+              </div>
             </div>
           </div>
-          <div class="tool-section">
-            <span class="tool-label">Crop</span>
-            <div class="choice-rail" id="cropRail" aria-label="Crop ratio">
-              <button class="active" type="button" data-crop="0.75">3:4</button>
-              <button type="button" data-crop="1">Square</button>
-              <button type="button" data-crop="0.5625">Story</button>
-              <button type="button" data-crop="1.333333">4:3</button>
-              <button type="button" data-crop="original">Original</button>
-            </div>
-            <label class="inline-range">Position <input id="cropPositionControl" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
-          </div>
-          <div class="tool-section">
-            <span class="tool-label">Motion</span>
-            <div class="choice-rail" id="motionRail" aria-label="Motion damage">
-              <button class="active" type="button" data-motion="still">Still</button>
-              <button type="button" data-motion="shake">Shake</button>
-              <button type="button" data-motion="ghost">Ghost</button>
-              <button type="button" data-motion="trails">Trails</button>
-            </div>
-            <label class="inline-range">Amount <input id="motionControl" type="range" min="0" max="1" step="0.01" value="0.45" /></label>
-          </div>
-          <details class="tool-section timestamp-tool">
-            <summary><span><span class="tool-label">Timeline</span><strong>Alam’s Dump stamp</strong></span><small>Customize name & date</small></summary>
-            <div class="timeline-options">
-              <label>Stamp name<input id="stampNameControl" type="text" maxlength="32" placeholder="Alam’s Dump" value="Alam’s Dump" /></label>
-              <small>Keep Alam’s Dump as-is, or replace it with your own name.</small>
-              <label class="toggle-line"><input id="timestampNow" type="checkbox" checked /> Use my current local time</label>
-              <input id="customTimestamp" type="datetime-local" disabled aria-label="Custom timestamp" />
-            </div>
-          </details>
-          <div class="preset-rail" aria-label="Effect recipes">
-            <button class="active" type="button" data-preset="reference">Reference</button>
-            <button type="button" data-preset="night">Night signal</button>
-            <button type="button" data-preset="heat">Heat leak</button>
-            <button type="button" data-preset="hardSensor">Hard sensor</button>
-          </div>
-          <div class="control-grid">
-            <label>Contrast<input id="contrastControl" type="range" min="1" max="1.8" step="0.01" value="1.38" /></label>
-            <label>Grain<input id="grainControl" type="range" min="0" max="32" step="1" value="17" /></label>
-            <label>Noise cancellation<input id="noiseCancelControl" type="range" min="0" max="1" step="0.01" value="0.48" /></label>
-            <label>Sharpness<input id="sharpnessControl" type="range" min="0" max="1.6" step="0.01" value="0.78" /></label>
-            <label>Cyan shadow<input id="cyanControl" type="range" min="0" max="0.16" step="0.005" value="0.075" /></label>
-            <label>Dither<input id="ditherControl" type="range" min="0" max="14" step="1" value="7" /></label>
-            <label>Prism split<input id="aberrationControl" type="range" min="0" max="5" step="0.25" value="1.25" /></label>
-            <label>Scan field<input id="scanlineControl" type="range" min="0" max="0.2" step="0.01" value="0.055" /></label>
-            <label>Sensor dust<input id="dustControl" type="range" min="0" max="0.12" step="0.005" value="0.018" /></label>
-            <label>Heat leak<input id="leakControl" type="range" min="0" max="0.5" step="0.01" value="0.08" /></label>
-          </div>
-          <div class="contact-sheet-tool">
-            <div><strong>Compare four versions</strong><small>No sheet space is reserved until you make one.</small></div>
-            <button id="contactSheetButton" type="button" aria-expanded="false" aria-controls="contactSheetCanvas">Make 4-sheet</button>
-          </div>
+
           <div class="feature-ask" id="featureAsk" hidden>
             <div><strong>Hang this on the public wall?</strong><small>Your edited image is checked first, then posted publicly. No sign-in needed.</small></div>
             <div><button id="featureYes" type="button">Approve &amp; hang</button><button id="featureNo" type="button">Keep private</button></div>
           </div>
-          <canvas id="contactSheetCanvas" width="880" height="1200" hidden></canvas>
         </div>
       </section>
 
@@ -272,5 +363,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js" defer></script>
+    <script src="layout.js" defer></script>
   </body>
 </html>
