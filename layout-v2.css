@@ -1,0 +1,333 @@
+/* ==========================================================================
+   Alam's Dump — Layout v2
+   Additive stylesheet. Loaded AFTER styles.css in <head>.
+   Only touches new wrapper classes (.lab-shell, .lab-sidebar, .lab-center,
+   .lab-context, .lab-topbar, .category-*, .zoom-*, .compare-*) plus a
+   couple of small utility hooks. Nothing in styles.css is overridden by
+   selector-specificity fights — this file is purely additive.
+   ========================================================================== */
+
+/* ---- Header: New Photo button -------------------------------------- */
+.header-new-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--ink);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.header-new-photo:hover,
+.header-new-photo:focus-visible {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+/* ---- Shell: sidebar / center / context ------------------------------ */
+.lab-shell {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 280px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.lab-topbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--panel);
+  backdrop-filter: blur(18px);
+}
+
+.lab-search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.lab-search svg {
+  flex: none;
+  opacity: 0.6;
+}
+
+.lab-search input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: var(--ink);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.85rem;
+}
+
+.lab-search input:focus {
+  outline: none;
+}
+
+.lab-search input::placeholder {
+  color: var(--muted);
+}
+
+.lab-topbar-hint {
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---- Left sidebar: category list ------------------------------------ */
+.lab-sidebar {
+  position: sticky;
+  top: 6rem;
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--panel);
+  backdrop-filter: blur(18px);
+}
+
+.category-nav-item {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: none;
+  border-radius: 0.7rem;
+  background: transparent;
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.category-nav-item:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.category-nav-item.active {
+  color: var(--bg);
+  background: var(--cyan);
+  font-weight: 700;
+}
+
+/* ---- Center: preview stage ------------------------------------------ */
+.lab-center {
+  min-width: 0;
+}
+
+.preview-stage-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.7rem;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+}
+
+.preview-stage-controls .stage-group {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.preview-stage-controls button {
+  min-height: 2.1rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.preview-stage-controls button.active,
+.preview-stage-controls button:hover {
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+
+/* Single-canvas default: hide "before" figure and let "after" take the
+   full stage. Toggling .is-compare on .canvas-compare restores the
+   original two-up before/after view without touching app.js. */
+.canvas-compare figure[data-role="before"] {
+  display: none;
+}
+
+.canvas-compare.is-compare {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.canvas-compare.is-compare figure[data-role="before"] {
+  display: grid;
+}
+
+.canvas-compare:not(.is-compare) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.canvas-compare:not(.is-compare) figure[data-role="after"] canvas {
+  width: 100%;
+  height: auto;
+  max-height: 74vh;
+}
+
+/* Zoom / pan viewport */
+.preview-viewport {
+  overflow: hidden;
+  border-radius: 1.2rem;
+  cursor: grab;
+}
+
+.preview-viewport.is-panning {
+  cursor: grabbing;
+}
+
+.preview-viewport canvas {
+  transform-origin: center center;
+  transition: transform 0.12s ease-out;
+  touch-action: none;
+}
+
+/* ---- Right sidebar: contextual controls ------------------------------ */
+.lab-context {
+  position: sticky;
+  top: 6rem;
+  display: grid;
+  gap: 1rem;
+  max-height: calc(100vh - 8rem);
+  overflow-y: auto;
+  padding-right: 0.15rem;
+}
+
+.category-panel-title {
+  margin: 0 0 0.6rem;
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.category-empty-state {
+  padding: 1.4rem 1rem;
+  border: 1px dashed var(--line);
+  border-radius: 1rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+/* Collapsed-by-default extras tucked inside Export */
+.export-optional {
+  border-top: 1px solid var(--line);
+  padding-top: 0.9rem;
+  margin-top: 0.3rem;
+}
+
+.export-optional summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.export-optional summary::-webkit-details-marker {
+  display: none;
+}
+
+.export-optional[open] summary {
+  color: var(--cyan);
+}
+
+/* Search: dim non-matching controls within the active panel instead of
+   hiding them outright, so users still see what exists. */
+[data-search-match="false"] {
+  opacity: 0.28;
+  filter: saturate(0.4);
+}
+
+/* ---- Mobile: collapse sidebar/context into stacked sections --------- */
+@media (max-width: 920px) {
+  .lab-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lab-sidebar {
+    position: static;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    overflow-x: auto;
+    gap: 0.4rem;
+  }
+
+  .lab-context {
+    position: static;
+    max-height: none;
+  }
+
+  .lab-topbar {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 560px) {
+  .lab-topbar-hint {
+    display: none;
+  }
+}
+
+/* ---- Landing page: minimal creative polish --------------------------- */
+.brand-mark {
+  position: relative;
+  overflow: hidden;
+}
+
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 40%, rgba(84, 243, 255, 0.55) 50%, transparent 60%);
+  transform: translateX(-120%);
+  animation: brandSweep 7s ease-in-out infinite;
+}
+
+@keyframes brandSweep {
+  0%, 70% { transform: translateX(-120%); }
+  85% { transform: translateX(120%); }
+  100% { transform: translateX(120%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-mark::after {
+    animation: none;
+    display: none;
+  }
+}
