@@ -216,6 +216,77 @@
                   <label data-search-label="Heat leak">Heat leak<input id="leakControl" type="range" min="0" max="0.5" step="0.01" value="0.08" /></label>
                 </div>
                 <p class="category-empty-state">Named film stocks (Portra, Ektar, Tri-X, Cinestill, and the rest) land with the next update — the recipes above are the current stand-ins.</p>
+
+                <p class="category-panel-title">Film &amp; Light</p>
+
+                <details class="tool-section">
+                  <summary><span class="tool-label" data-search-label="Halation">Halation / Bloom</span><small>Warm glow around bright edges</small></summary>
+                  <label class="toggle-line"><input id="haloEnable" type="checkbox" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Strength<input id="haloStrength" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Radius<input id="haloRadius" type="range" min="1" max="30" step="1" value="10" /></label>
+                    <label>Warmth<input id="haloWarmth" type="range" min="0" max="1" step="0.01" value="0.7" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section">
+                  <summary><span class="tool-label" data-search-label="Light Leak">Light Leak</span><small>Directional edge leak</small></summary>
+                  <label class="toggle-line"><input id="leak2Enable" type="checkbox" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Strength<input id="leak2Strength" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Angle<input id="leak2Angle" type="range" min="0" max="360" step="1" value="45" /></label>
+                    <label>Warmth<input id="leak2Warmth" type="range" min="0" max="1" step="0.01" value="0.7" /></label>
+                    <label>Fade<input id="leak2Fade" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section">
+                  <summary><span class="tool-label" data-search-label="Bleach Bypass">Overexposure / Bleach Bypass</span><small>Crushed highlights, punchy contrast</small></summary>
+                  <label class="toggle-line"><input id="bleachEnable" type="checkbox" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Strength<input id="bleachStrength" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Recovery<input id="bleachRecovery" type="range" min="0" max="1" step="0.01" value="0.3" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section">
+                  <summary><span class="tool-label" data-search-label="Orton Glow">Dreamy Glow / Orton</span><small>Soft focus overlay</small></summary>
+                  <label class="toggle-line"><input id="ortonEnable" type="checkbox" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Amount<input id="ortonAmount" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
+                    <label>Blur radius<input id="ortonBlur" type="range" min="1" max="24" step="1" value="8" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section">
+                  <summary><span class="tool-label" data-search-label="Ethereal Diffusion">Ethereal Diffusion</span><small>"Not really here" softness</small></summary>
+                  <label class="toggle-line"><input id="diffuseEnable" type="checkbox" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Strength<input id="diffuseStrength" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
+                    <label>Blur radius<input id="diffuseBlur" type="range" min="1" max="20" step="1" value="6" /></label>
+                    <label>Highlight bias<input id="diffuseHighlight" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section">
+                  <summary><span class="tool-label" data-search-label="God Rays">Window Light / God Rays</span><small>Directional flare pass</small></summary>
+                  <label class="toggle-line"><input id="godrayEnable" type="checkbox" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Strength<input id="godrayStrength" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
+                    <label>Angle<input id="godrayAngle" type="range" min="0" max="360" step="1" value="200" /></label>
+                    <label>Length<input id="godrayLength" type="range" min="0.1" max="1.2" step="0.05" value="0.6" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section">
+                  <summary><span class="tool-label" data-search-label="Liminal Fog">Liminal Fog / Haze</span><small>Atmospheric color cast</small></summary>
+                  <label class="toggle-line"><input id="fogEnable" type="checkbox" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Density<input id="fogDensity" type="range" min="0" max="1" step="0.01" value="0.3" /></label>
+                    <label>Tint<input id="fogTint" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                    <label>Falloff<input id="fogFalloff" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                  </div>
+                </details>
               </div>
 
               <div data-category="pixel" hidden>
@@ -265,6 +336,45 @@
                   <label data-search-label="Prism split">Prism split<input id="aberrationControl" type="range" min="0" max="5" step="0.25" value="1.25" /></label>
                   <label data-search-label="Sensor dust">Sensor dust<input id="dustControl" type="range" min="0" max="0.12" step="0.005" value="0.018" /></label>
                 </div>
+
+                <p class="category-panel-title">Glitch &amp; Fracture</p>
+
+                <details class="tool-section">
+                  <summary><span class="tool-label" data-search-label="Prism Shatter">Digital Fracture / Prism Shatter</span><small>Channel split + displacement cracks</small></summary>
+                  <label class="toggle-line"><input id="fractureEnable" type="checkbox" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Intensity<input id="fractureIntensity" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Complexity<input id="fractureComplexity" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section">
+                  <summary><span class="tool-label" data-search-label="Chromatic Bloom">Chromatic Aberration (enhanced)</span><small>Extra radial color fringe</small></summary>
+                  <label class="toggle-line"><input id="chromaBoostEnable" type="checkbox" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Strength<input id="chromaBoostStrength" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
+                  </div>
+                  <label class="toggle-line"><input id="chromaBoostFlicker" type="checkbox" /> Flicker on remix</label>
+                </details>
+
+                <details class="tool-section">
+                  <summary><span class="tool-label" data-search-label="Signal Tear">Signal Tear / Datamosh</span><small>Blocky compression glitches</small></summary>
+                  <label class="toggle-line"><input id="tearEnable" type="checkbox" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Intensity<input id="tearIntensity" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Block size<input id="tearBlock" type="range" min="2" max="24" step="1" value="8" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section">
+                  <summary><span class="tool-label" data-search-label="Spectral Shift">Spectral Shift</span><small>RGB channel offset with bleed</small></summary>
+                  <label class="toggle-line"><input id="spectralEnable" type="checkbox" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Amount<input id="spectralAmount" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
+                    <label>Bleed<input id="spectralBleed" type="range" min="0.5" max="8" step="0.5" value="2" /></label>
+                    <label>Angle<input id="spectralAngle" type="range" min="0" max="360" step="1" value="0" /></label>
+                  </div>
+                </details>
               </div>
 
               <div data-category="color" hidden>
@@ -364,5 +474,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js" defer></script>
     <script src="layout.js" defer></script>
+    <script src="effects-v2.js" defer></script>
   </body>
 </html>

@@ -1134,6 +1134,7 @@ function renderSourceToCanvas(source, canvas, params = DEFAULT_PARAMS, seed = 20
   const artifactData = outputContext.getImageData(0, 0, outputWidth, outputHeight);
   outputContext.putImageData(applyArtifactPixels(artifactData, params, seed + 31), 0, 0);
   applyCreativeEffect(canvas, params, seed + 47);
+  if (typeof window.applyAlamsDumpExtraEffects === 'function') window.applyAlamsDumpExtraEffects(canvas, seed + 61);
   drawTimestamp(canvas, params.timestampDate ? new Date(params.timestampDate) : new Date(), params.stampName);
 }
 
@@ -1386,6 +1387,7 @@ function initialize() {
     if (immediate) render();
     else editRenderTimer = window.setTimeout(render, 70);
   };
+  window.alamsDumpRerender = () => renderUserEdit();
 
   const runWhenIdle = (callback) => {
     if ('requestIdleCallback' in window) window.requestIdleCallback(callback, { timeout: 900 });
