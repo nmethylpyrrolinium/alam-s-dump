@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#05070d" />
+    <meta
+      name="description"
+      content="Alam’s Dump is a private-feeling browser photo lab for restoring and styling digital keepsakes."
+    />
+    <title>Alam’s Dump — Digital Keepsake Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@500;700;800;900&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="layout-v2.css" />
+    <link rel="stylesheet" href="cards-v2.css" />
+  </head>
+  <body>
+    <section class="admin-shell" id="adminView" hidden aria-live="polite"></section>
+
+    <div class="grain veil" aria-hidden="true"></div>
+    <div class="orb orb-a" aria-hidden="true"></div>
+    <div class="orb orb-b" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Alam’s Dump home">
+        <span class="brand-mark">A/D</span>
+        <span class="brand-copy">
+          <strong>Alam’s Dump</strong>
+          <small>digital keepsake lab</small>
+        </span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#lab">Edit</a>
+        <a href="#wall">Wall</a>
+        <a href="#lab">Hang a photo</a>
+      </nav>
+      <button class="header-new-photo" id="newPhotoButton" type="button">New photo</button>
+    </header>
+
+    <main id="top">
+      <section class="hero section-shell">
+        <div class="hero-copy">
+          <p class="eyebrow">ALAM’S DUMP / 2026</p>
+          <h1>Restore. Damage. Export.</h1>
+          <p class="lede">A private photo lab that runs entirely in your browser.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#lab">Edit a photo</a>
+            <a class="button ghost" href="#wall">See the wall</a>
+          </div>
+          <dl class="metric-strip" aria-label="Reconstruction parameters">
+            <div>
+              <dt>Black point</dt>
+              <dd>0.045</dd>
+            </div>
+            <div>
+              <dt>Blue bias</dt>
+              <dd>+14%</dd>
+            </div>
+            <div>
+              <dt>Noise cancel</dt>
+              <dd>48%</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="hero-stage" id="wall" aria-label="A living wall of swirling finished photographs">
+          <div class="wall-hanging" aria-hidden="true">
+            <span class="hanging-pin"></span>
+            <span class="hanging-thread thread-left"></span>
+            <span class="hanging-thread thread-right"></span>
+            <div class="hanging-banner"><small>OPEN WALL</small><strong>HANG<br />YOUR PHOTO</strong><i></i></div>
+            <span class="hanging-tassel tassel-one"></span>
+            <span class="hanging-tassel tassel-two"></span>
+            <span class="hanging-tassel tassel-three"></span>
+          </div>
+          <div class="living-wall" id="featuredGallery" aria-live="polite" tabindex="0" aria-label="User photo wall. Scroll or drag to move along the rope.">
+            <div class="wall-rope" aria-hidden="true"></div>
+            <div class="wall-track" id="wallTrack"></div>
+            <div class="wall-empty" id="wallEmpty">
+              <strong>The rope is waiting.</strong>
+              <span>Hang the first user photo from the editor below.</span>
+            </div>
+            <div class="wall-guide" aria-hidden="true"><span>SCROLL / DRAG</span><i></i><span>CLICK TO OPEN</span></div>
+            <button class="wall-pause" id="wallPause" type="button" aria-pressed="false">Pause wall</button>
+          </div>
+          <dialog class="wall-lightbox" id="wallLightbox" aria-label="Selected wall photo">
+            <button type="button" class="wall-lightbox-close" aria-label="Close photo">×</button>
+            <img alt="Selected user wall photo" />
+            <p></p>
+          </dialog>
+        </div>
+      </section>
+
+      <section class="lab lab--v2 section-shell reveal-on-scroll" id="lab">
+        <div class="lab-copy">
+          <p class="eyebrow">Live browser implementation</p>
+          <h2>Pick a photo. Restore it locally. Keep the evidence.</h2>
+          <p>
+            Processing uses Canvas ImageData, deterministic grain, HSL hue
+            remapping, a shaped tone LUT, ordered dither, bloom, and a
+            timestamp compositor — all on-device.
+          </p>
+          <div class="file-drop" id="dropZone">
+            <input id="imageInput" type="file" accept="image/*" />
+            <input id="cameraInput" type="file" accept="image/*" capture="environment" />
+            <span class="drop-kicker">DROP ZONE / PRIVATE BY DEFAULT</span>
+            <strong>Drag a photo here or choose how to add one.</strong>
+            <small>Images are processed in your browser and never uploaded.</small>
+            <div class="upload-actions">
+              <label class="upload-button primary-upload" for="imageInput">Choose from library</label>
+              <label class="upload-button" for="cameraInput">Take a photo</label>
+            </div>
+            <p id="uploadStatus" class="upload-status" role="status" aria-live="polite">Ready for JPG, PNG, WebP, GIF, or browser-supported image files.</p>
+          </div>
+        </div>
+
+        <div class="lab-panel">
+          <div class="preview-toolbar">
+            <strong>02 / EDIT</strong>
+            <div class="output-actions">
+              <button id="remixButton" type="button" title="Generate a fresh deterministic grain pattern">New grain</button>
+              <button id="shareButton" type="button">Share</button>
+              <button id="downloadButton" type="button">Download JPEG</button>
+            </div>
+          </div>
+
+          <div class="lab-topbar">
+            <div class="lab-search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input id="labSearchInput" type="search" placeholder="Search controls…" aria-label="Search editor controls" />
+            </div>
+            <span class="lab-topbar-hint">Type to jump to a control</span>
+          </div>
+
+          <div class="lab-shell">
+            <nav class="lab-sidebar" aria-label="Effect categories">
+              <button class="category-nav-item" type="button" data-category-nav="essentials">Essentials</button>
+              <button class="category-nav-item" type="button" data-category-nav="film">Film Cameras</button>
+              <button class="category-nav-item" type="button" data-category-nav="pixel">Pixel &amp; Digital</button>
+              <button class="category-nav-item" type="button" data-category-nav="print">Print &amp; Analog</button>
+              <button class="category-nav-item" type="button" data-category-nav="retro">Retro &amp; CRT</button>
+              <button class="category-nav-item" type="button" data-category-nav="artistic">Artistic</button>
+              <button class="category-nav-item" type="button" data-category-nav="color">Color &amp; Tone</button>
+              <button class="category-nav-item" type="button" data-category-nav="export">Export</button>
+            </nav>
+
+            <div class="lab-center">
+              <div class="preview-stage-controls">
+                <div class="stage-group">
+                  <button type="button" class="active" data-zoom="fit">Fit</button>
+                  <button type="button" data-zoom="100">100%</button>
+                  <button id="resetViewButton" type="button">Reset view</button>
+                </div>
+                <div class="stage-group">
+                  <button id="compareToggleButton" type="button">Before / after</button>
+                </div>
+              </div>
+              <div class="preview-viewport">
+                <div class="canvas-compare" aria-label="Source image and filtered photon output comparison">
+                  <figure data-role="before">
+                    <canvas id="sourceCanvas" width="410" height="547"></canvas>
+                    <figcaption>before</figcaption>
+                  </figure>
+                  <figure data-role="after">
+                    <canvas id="outputCanvas" width="410" height="547"></canvas>
+                    <figcaption>after</figcaption>
+                  </figure>
+                </div>
+              </div>
+            </div>
+
+            <div class="lab-context" id="labContext">
+              <div class="effects-stack-panel" id="effectsStackPanel">
+                <div class="effects-stack-header">
+                  <span class="tool-label">Active effects <small id="stackCount">(0/5)</small></span>
+                  <button type="button" id="randomizeStackButton">Randomize</button>
+                </div>
+                <p class="effects-stack-empty" id="effectsStackEmpty">Enable an effect card below to build your stack.</p>
+                <ol class="effects-stack-list" id="effectsStackList"></ol>
+                <div class="effects-quick-row" id="favoritesRow" hidden>
+                  <span class="tool-label">★ Favorites</span>
+                  <div class="effects-chip-row" id="favoritesChips"></div>
+                </div>
+                <div class="effects-quick-row" id="recentRow" hidden>
+                  <span class="tool-label">Recent</span>
+                  <div class="effects-chip-row" id="recentChips"></div>
+                </div>
+              </div>
+
+              <div data-category="essentials" hidden>
+                <p class="category-panel-title">Essentials</p>
+                <div class="tool-section">
+                  <span class="tool-label" data-search-label="Crop">Crop</span>
+                  <div class="choice-rail" id="cropRail" aria-label="Crop ratio">
+                    <button class="active" type="button" data-crop="0.75">3:4</button>
+                    <button type="button" data-crop="1">Square</button>
+                    <button type="button" data-crop="0.5625">Story</button>
+                    <button type="button" data-crop="1.333333">4:3</button>
+                    <button type="button" data-crop="original">Original</button>
+                  </div>
+                  <label class="inline-range">Position <input id="cropPositionControl" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                </div>
+                <div class="control-grid">
+                  <label data-search-label="Noise cancellation">Noise cancellation<input id="noiseCancelControl" type="range" min="0" max="1" step="0.01" value="0.48" /></label>
+                  <label data-search-label="Sharpness">Sharpness<input id="sharpnessControl" type="range" min="0" max="1.6" step="0.01" value="0.78" /></label>
+                  <label data-search-label="Contrast">Contrast<input id="contrastControl" type="range" min="1" max="1.8" step="0.01" value="1.38" /></label>
+                </div>
+                <details class="tool-section timestamp-tool">
+                  <summary><span><span class="tool-label" data-search-label="Timestamp">Timeline</span><strong>Alam’s Dump stamp</strong></span><small>Customize name &amp; date</small></summary>
+                  <div class="timeline-options">
+                    <label>Stamp name<input id="stampNameControl" type="text" maxlength="32" placeholder="Alam’s Dump" value="Alam’s Dump" /></label>
+                    <small>Keep Alam’s Dump as-is, or replace it with your own name.</small>
+                    <label class="toggle-line"><input id="timestampNow" type="checkbox" checked /> Use my current local time</label>
+                    <input id="customTimestamp" type="datetime-local" disabled aria-label="Custom timestamp" />
+                  </div>
+                </details>
+              </div>
+
+              <div data-category="film" hidden>
+                <p class="category-panel-title">Recipes</p>
+                <div class="preset-rail" aria-label="Effect recipes">
+                  <button class="active" type="button" data-preset="reference">Reference</button>
+                  <button type="button" data-preset="night">Night signal</button>
+                  <button type="button" data-preset="heat">Heat leak</button>
+                  <button type="button" data-preset="hardSensor">Hard sensor</button>
+                </div>
+                <div class="control-grid">
+                  <label data-search-label="Grain">Grain<input id="grainControl" type="range" min="0" max="32" step="1" value="17" /></label>
+                  <label data-search-label="Heat leak">Heat leak<input id="leakControl" type="range" min="0" max="0.5" step="0.01" value="0.08" /></label>
+                </div>
+                <p class="category-empty-state">Named film stocks (Portra, Ektar, Tri-X, Cinestill, and the rest) land with the next update — the recipes above are the current stand-ins.</p>
+
+                <p class="category-panel-title">Film &amp; Light</p>
+
+                <details class="tool-section effect-card" data-effect-key="halo">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="halo"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Halation">Halation / Bloom</strong>
+                      <small>Warm glow around bright edges</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="halo" aria-label="Favorite Halation / Bloom" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="haloEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Strength<input id="haloStrength" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Radius<input id="haloRadius" type="range" min="1" max="30" step="1" value="10" /></label>
+                    <label>Warmth<input id="haloWarmth" type="range" min="0" max="1" step="0.01" value="0.7" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="leak2">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="leak2"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Light Leak">Light Leak</strong>
+                      <small>Directional edge leak</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="leak2" aria-label="Favorite Light Leak" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="leak2Enable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Strength<input id="leak2Strength" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Angle<input id="leak2Angle" type="range" min="0" max="360" step="1" value="45" /></label>
+                    <label>Warmth<input id="leak2Warmth" type="range" min="0" max="1" step="0.01" value="0.7" /></label>
+                    <label>Fade<input id="leak2Fade" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="bleach">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="bleach"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Bleach Bypass">Overexposure / Bleach Bypass</strong>
+                      <small>Crushed highlights, punchy contrast</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="bleach" aria-label="Favorite Overexposure / Bleach Bypass" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="bleachEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Strength<input id="bleachStrength" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Recovery<input id="bleachRecovery" type="range" min="0" max="1" step="0.01" value="0.3" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="orton">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="orton"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Orton Glow">Dreamy Glow / Orton</strong>
+                      <small>Soft focus overlay</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="orton" aria-label="Favorite Dreamy Glow / Orton" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="ortonEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Amount<input id="ortonAmount" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
+                    <label>Blur radius<input id="ortonBlur" type="range" min="1" max="24" step="1" value="8" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="diffuse">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="diffuse"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Ethereal Diffusion">Ethereal Diffusion</strong>
+                      <small>"Not really here" softness</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="diffuse" aria-label="Favorite Ethereal Diffusion" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="diffuseEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Strength<input id="diffuseStrength" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
+                    <label>Blur radius<input id="diffuseBlur" type="range" min="1" max="20" step="1" value="6" /></label>
+                    <label>Highlight bias<input id="diffuseHighlight" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="godray">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="godray"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="God Rays">Window Light / God Rays</strong>
+                      <small>Directional flare pass</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="godray" aria-label="Favorite Window Light / God Rays" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="godrayEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Strength<input id="godrayStrength" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
+                    <label>Angle<input id="godrayAngle" type="range" min="0" max="360" step="1" value="200" /></label>
+                    <label>Length<input id="godrayLength" type="range" min="0.1" max="1.2" step="0.05" value="0.6" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="fog">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="fog"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Liminal Fog">Liminal Fog / Haze</strong>
+                      <small>Atmospheric color cast</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="fog" aria-label="Favorite Liminal Fog / Haze" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="fogEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Density<input id="fogDensity" type="range" min="0" max="1" step="0.01" value="0.3" /></label>
+                    <label>Tint<input id="fogTint" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                    <label>Falloff<input id="fogFalloff" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                  </div>
+                </details>
+              </div>
+
+              <div data-category="pixel" hidden>
+                <p class="category-panel-title">Pixel &amp; Digital</p>
+                <p class="category-empty-state">8-bit, pixel mosaic, LCD pixel, and nearest-neighbor upscale effects are landing in the next update.</p>
+              </div>
+
+              <div data-category="print" hidden>
+                <p class="category-panel-title">Print &amp; Analog</p>
+                <p class="category-empty-state">Halftone, risograph, newspaper print, and CMYK effects are landing in the next update.</p>
+              </div>
+
+              <div data-category="retro" hidden>
+                <p class="category-panel-title">Retro &amp; CRT</p>
+                <div class="tool-section">
+                  <span class="tool-label" data-search-label="Motion">Motion</span>
+                  <div class="choice-rail" id="motionRail" aria-label="Motion damage">
+                    <button class="active" type="button" data-motion="still">Still</button>
+                    <button type="button" data-motion="shake">Shake</button>
+                    <button type="button" data-motion="ghost">Ghost</button>
+                    <button type="button" data-motion="trails">Trails</button>
+                  </div>
+                  <label class="inline-range">Amount <input id="motionControl" type="range" min="0" max="1" step="0.01" value="0.45" /></label>
+                </div>
+                <div class="control-grid">
+                  <label data-search-label="Dither">Dither<input id="ditherControl" type="range" min="0" max="14" step="1" value="7" /></label>
+                  <label data-search-label="Scan field">Scan field<input id="scanlineControl" type="range" min="0" max="0.2" step="0.01" value="0.055" /></label>
+                </div>
+              </div>
+
+              <div data-category="artistic" hidden>
+                <p class="category-panel-title">Artistic &amp; Distortion</p>
+                <div class="tool-section effect-studio">
+                  <span class="tool-label" data-search-label="Creative mode">Creative mode</span>
+                  <div class="effect-grid" id="effectRail" aria-label="Creative effect mode">
+                    <button class="active" type="button" data-effect="classic"><strong>Classic detail</strong><small>Clean restoration base</small></button>
+                    <button type="button" data-effect="glitch"><strong>RGB glitch</strong><small>Channel split + signal tears</small></button>
+                    <button type="button" data-effect="dispersion"><strong>Pixel dispersion</strong><small>Directional sensor breakup</small></button>
+                    <button type="button" data-effect="neonNoir"><strong>Neon noir</strong><small>Cyan / magenta night grade</small></button>
+                  </div>
+                  <div class="control-grid effect-controls">
+                    <label>Effect intensity<input id="effectIntensityControl" type="range" min="0" max="1" step="0.01" value="0.68" /></label>
+                    <label>Direction / offset<input id="effectDirectionControl" type="range" min="-1" max="1" step="0.01" value="0.45" /></label>
+                  </div>
+                </div>
+                <div class="control-grid">
+                  <label data-search-label="Prism split">Prism split<input id="aberrationControl" type="range" min="0" max="5" step="0.25" value="1.25" /></label>
+                  <label data-search-label="Sensor dust">Sensor dust<input id="dustControl" type="range" min="0" max="0.12" step="0.005" value="0.018" /></label>
+                </div>
+
+                <p class="category-panel-title">Glitch &amp; Fracture</p>
+
+                <details class="tool-section effect-card" data-effect-key="fracture">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="fracture"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Prism Shatter">Digital Fracture / Prism Shatter</strong>
+                      <small>Channel split + displacement cracks</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="fracture" aria-label="Favorite Digital Fracture / Prism Shatter" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="fractureEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Intensity<input id="fractureIntensity" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Complexity<input id="fractureComplexity" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="chromaBoost">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="chromaBoost"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Chromatic Bloom">Chromatic Aberration (enhanced)</strong>
+                      <small>Extra radial color fringe</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="chromaBoost" aria-label="Favorite Chromatic Aberration (enhanced)" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="chromaBoostEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Strength<input id="chromaBoostStrength" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
+                  </div>
+                  <label class="toggle-line"><input id="chromaBoostFlicker" type="checkbox" /> Flicker on remix</label>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="tear">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="tear"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Signal Tear">Signal Tear / Datamosh</strong>
+                      <small>Blocky compression glitches</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="tear" aria-label="Favorite Signal Tear / Datamosh" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="tearEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Intensity<input id="tearIntensity" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Block size<input id="tearBlock" type="range" min="2" max="24" step="1" value="8" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="spectral">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="spectral"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Spectral Shift">Spectral Shift</strong>
+                      <small>RGB channel offset with bleed</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="spectral" aria-label="Favorite Spectral Shift" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="spectralEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Amount<input id="spectralAmount" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
+                    <label>Bleed<input id="spectralBleed" type="range" min="0.5" max="8" step="0.5" value="2" /></label>
+                    <label>Angle<input id="spectralAngle" type="range" min="0" max="360" step="1" value="0" /></label>
+                  </div>
+                </details>
+              </div>
+
+              <div data-category="color" hidden>
+                <p class="category-panel-title">Color &amp; Tone</p>
+                <div class="control-grid">
+                  <label data-search-label="Cyan shadow">Cyan shadow<input id="cyanControl" type="range" min="0" max="0.16" step="0.005" value="0.075" /></label>
+                </div>
+                <p class="category-empty-state">Full HSL, curves, levels, and white balance land with the Color &amp; Tone update.</p>
+              </div>
+
+              <div data-category="export" hidden>
+                <p class="category-panel-title">Export</p>
+                <p class="category-empty-state">PNG/WEBP export, a quality slider, and a metadata toggle land with the Export update. JPEG export works today from the buttons above the canvas.</p>
+                <details class="export-optional">
+                  <summary>Compare four versions</summary>
+                  <div class="contact-sheet-tool">
+                    <div><strong>Compare four versions</strong><small>No sheet space is reserved until you make one.</small></div>
+                    <button id="contactSheetButton" type="button" aria-expanded="false" aria-controls="contactSheetCanvas">Make 4-sheet</button>
+                  </div>
+                  <canvas id="contactSheetCanvas" width="880" height="1200" hidden></canvas>
+                </details>
+                <details class="export-optional">
+                  <summary>Diagnostics</summary>
+                  <div class="signature-panel" aria-live="polite">
+                    <div>
+                      <span class="eyebrow">Automated image comparison</span>
+                      <strong id="signatureVerdict">Waiting for render…</strong>
+                    </div>
+                    <ul id="signatureReport"></ul>
+                  </div>
+                </details>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-ask" id="featureAsk" hidden>
+            <div><strong>Hang this on the public wall?</strong><small>Your edited image is checked first, then posted publicly. No sign-in needed.</small></div>
+            <div><button id="featureYes" type="button">Approve &amp; hang</button><button id="featureNo" type="button">Keep private</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="rarities section-shell" aria-labelledby="raritiesTitle">
+        <p class="eyebrow">Labor-intensive effects, made immediate</p>
+        <h2 id="raritiesTitle">Artifacts that usually take hours to build by hand.</h2>
+        <div class="rarity-grid">
+          <article><span>01 / PRISM</span><h3>Radial channel separation</h3><p>Red and blue channels diverge progressively toward the lens edge instead of using a cheap global offset.</p></article>
+          <article><span>02 / FIELD</span><h3>Deterministic sensor scars</h3><p>Seeded dust, periodic scan fields, and high-frequency damage remain repeatable for real visual regression.</p></article>
+          <article><span>03 / HEAT</span><h3>Spatial light contamination</h3><p>A shaped orange-red leak reacts across the frame while keeping the reference pipeline underneath intact.</p></article>
+          <article><span>04 / SHEET</span><h3>Instant art-direction contact sheet</h3><p>Render four complete recipes from one source, then compare treatment families without rebuilding them manually.</p></article>
+        </div>
+      </section>
+
+      <section class="pipeline section-shell" id="pipeline">
+        <p class="eyebrow">Exact processing order</p>
+        <h2>The mechanism of the photon engine</h2>
+        <ol class="pipeline-list">
+          <li><span>Crop</span>Center crop to a 3:4 vertical frame.</li>
+          <li><span>Resolve</span>Downscale to a low internal canvas for cheap sensor detail.</li>
+          <li><span>Tone</span>Exposure, black point, white point, gamma, and S-curve.</li>
+          <li><span>Color</span>Cool matrix, cyan shadows, hue-selective remapping.</li>
+          <li><span>Optics</span>Subtle bloom, vignette, radial prism split, and spatial heat leak.</li>
+          <li><span>Damage</span>Noise cancellation, controllable unsharp mask, RGB/luma grain, Bayer dither, scan field, sensor dust, and JPEG export.</li>
+          <li><span>Metadata</span>Hard white two-line monospaced timestamp with black edge.</li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Alam’s Dump — locally restoring and styling photos since 2026.</p>
+      <a href="#top">Back to top</a>
+    </footer>
+
+    <dialog class="notice-dialog" id="noticeDialog" aria-labelledby="noticeTitle">
+      <div class="notice-dialog-card">
+        <p class="eyebrow">A gentle heads-up</p>
+        <h2 id="noticeTitle">Notice from Alam’s Dump</h2>
+        <p id="noticeMessage"></p>
+        <button id="noticeDismiss" type="button">I understand</button>
+      </div>
+    </dialog>
+
+    <dialog class="notice-dialog" id="warningDialog" aria-labelledby="warningTitle">
+      <form class="notice-dialog-card warning-form" id="warningForm" method="dialog">
+        <p class="eyebrow">Moderation note</p>
+        <h2 id="warningTitle">Warn uploader or visitor</h2>
+        <label for="warningMessage">Message</label>
+        <textarea id="warningMessage" rows="5" maxlength="500" required>Your upload was removed because it may not follow the wall rules. Please keep Alam’s Dump safe and public-friendly.</textarea>
+        <p class="admin-feedback" id="warningFeedback" role="status"></p>
+        <div class="dialog-actions">
+          <button type="button" data-warning-cancel>Cancel</button>
+          <button type="submit">Send warning</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js" defer></script>
+    <script src="layout.js" defer></script>
+    <script src="effects-v2.js" defer></script>
+    <script src="cards-v2.js" defer></script>
+  </body>
+</html>
