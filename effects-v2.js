@@ -286,19 +286,35 @@
 
   /* ------------------------------ Wiring ------------------------------ */
 
-  window.applyAlamsDumpExtraEffects = function applyAlamsDumpExtraEffects(canvas, seed) {
-    if (bool('haloEnable')) applyHalation(canvas, num('haloStrength', 0), num('haloRadius', 10), num('haloWarmth', 0.7));
-    if (bool('leak2Enable')) applyDirectionalLightLeak(canvas, num('leak2Strength', 0), num('leak2Angle', 45), num('leak2Warmth', 0.7), num('leak2Fade', 0.5));
-    if (bool('bleachEnable')) applyBleachBypass(canvas, num('bleachStrength', 0), num('bleachRecovery', 0.3));
-    if (bool('ortonEnable')) applyOrtonGlow(canvas, num('ortonAmount', 0), num('ortonBlur', 8));
-    if (bool('diffuseEnable')) applyEtherealDiffusion(canvas, num('diffuseStrength', 0), num('diffuseBlur', 6), num('diffuseHighlight', 0.5));
-    if (bool('godrayEnable')) applyGodRays(canvas, num('godrayStrength', 0), num('godrayAngle', 200), num('godrayLength', 0.6));
-    if (bool('fogEnable')) applyLiminalFog(canvas, num('fogDensity', 0), num('fogTint', 0.5), num('fogFalloff', 0.5));
+  const EFFECT_DEFS = {
+    halo: { enabledId: 'haloEnable', run: (canvas, seed) => applyHalation(canvas, num('haloStrength', 0.4), num('haloRadius', 10), num('haloWarmth', 0.7)) },
+    leak2: { enabledId: 'leak2Enable', run: (canvas, seed) => applyDirectionalLightLeak(canvas, num('leak2Strength', 0.4), num('leak2Angle', 45), num('leak2Warmth', 0.7), num('leak2Fade', 0.5)) },
+    bleach: { enabledId: 'bleachEnable', run: (canvas, seed) => applyBleachBypass(canvas, num('bleachStrength', 0.4), num('bleachRecovery', 0.3)) },
+    orton: { enabledId: 'ortonEnable', run: (canvas, seed) => applyOrtonGlow(canvas, num('ortonAmount', 0.35), num('ortonBlur', 8)) },
+    diffuse: { enabledId: 'diffuseEnable', run: (canvas, seed) => applyEtherealDiffusion(canvas, num('diffuseStrength', 0.35), num('diffuseBlur', 6), num('diffuseHighlight', 0.5)) },
+    godray: { enabledId: 'godrayEnable', run: (canvas, seed) => applyGodRays(canvas, num('godrayStrength', 0.35), num('godrayAngle', 200), num('godrayLength', 0.6)) },
+    fog: { enabledId: 'fogEnable', run: (canvas, seed) => applyLiminalFog(canvas, num('fogDensity', 0.3), num('fogTint', 0.5), num('fogFalloff', 0.5)) },
+    fracture: { enabledId: 'fractureEnable', run: (canvas, seed) => applyPrismShatter(canvas, num('fractureIntensity', 0.4), num('fractureComplexity', 0.5), seed + 3) },
+    chromaBoost: { enabledId: 'chromaBoostEnable', run: (canvas, seed) => applyChromaBoost(canvas, num('chromaBoostStrength', 0.35), bool('chromaBoostFlicker'), seed + 5) },
+    tear: { enabledId: 'tearEnable', run: (canvas, seed) => applySignalTear(canvas, num('tearIntensity', 0.4), num('tearBlock', 8), seed + 7) },
+    spectral: { enabledId: 'spectralEnable', run: (canvas, seed) => applySpectralShift(canvas, num('spectralAmount', 0.35), num('spectralBleed', 2), num('spectralAngle', 0)) },
+  };
 
-    if (bool('fractureEnable')) applyPrismShatter(canvas, num('fractureIntensity', 0), num('fractureComplexity', 0.5), seed + 3);
-    if (bool('chromaBoostEnable')) applyChromaBoost(canvas, num('chromaBoostStrength', 0), bool('chromaBoostFlicker'), seed + 5);
-    if (bool('tearEnable')) applySignalTear(canvas, num('tearIntensity', 0), num('tearBlock', 8), seed + 7);
-    if (bool('spectralEnable')) applySpectralShift(canvas, num('spectralAmount', 0), num('spectralBleed', 2), num('spectralAngle', 0));
+  const DEFAULT_ORDER = Object.keys(EFFECT_DEFS);
+
+  // Exposed so a separate card/stack UI (cards-v2.js) can render thumbnails
+  // by calling .run() directly, and can control render order without this
+  // file needing to know anything about cards, favorites, or storage.
+  window.AlamsDumpEffectDefs = EFFECT_DEFS;
+
+  window.applyAlamsDumpExtraEffects = function applyAlamsDumpExtraEffects(canvas, seed) {
+    const order = Array.isArray(window.alamsDumpEffectOrder) && window.alamsDumpEffectOrder.length
+      ? window.alamsDumpEffectOrder.filter((key) => EFFECT_DEFS[key])
+      : DEFAULT_ORDER;
+    order.forEach((key) => {
+      const def = EFFECT_DEFS[key];
+      if (def && bool(def.enabledId)) def.run(canvas, seed);
+    });
   };
 
   ready(function wireExtraEffectControls() {

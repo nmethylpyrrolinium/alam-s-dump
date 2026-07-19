@@ -1,0 +1,221 @@
+/* ==========================================================================
+   Alam's Dump — Cards v2
+   Additive stylesheet for the effect-card UI and the stack/favorites/recent
+   panel. Loaded after layout-v2.css. Only targets new classes.
+   ========================================================================== */
+
+/* ---- Effect card (the <details> summary becomes the card face) ------ */
+.effect-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.effect-card > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.effect-card > summary::-webkit-details-marker {
+  display: none;
+}
+
+.effect-card-thumb {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  background: #090d14;
+  border: 1px solid var(--line);
+}
+
+.effect-card-thumb canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.effect-card-copy {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.effect-card-copy strong {
+  font-size: 0.82rem;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.effect-card-copy small {
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.3;
+}
+
+.effect-card-star {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.95rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.effect-card-star[aria-pressed="true"] {
+  color: #ffd65b;
+  border-color: #ffd65b;
+}
+
+.effect-card > .toggle-line,
+.effect-card > .control-grid {
+  padding: 0 0.65rem 0.65rem;
+}
+
+.effect-card.is-maxed:not([open]) {
+  opacity: 0.45;
+}
+
+.effect-card.is-maxed:not([open]) > summary {
+  cursor: not-allowed;
+}
+
+/* ---- Active effects stack panel (always visible, top of context) ---- */
+.effects-stack-panel {
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 1.15rem;
+  background: rgba(84, 243, 255, 0.045);
+}
+
+.effects-stack-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.effects-stack-header small {
+  color: var(--muted);
+  font-weight: 400;
+  margin-left: 0.3rem;
+}
+
+.effects-stack-header button {
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.effects-stack-header button:hover {
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+
+.effects-stack-empty {
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.effects-stack-list {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.effects-stack-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: var(--panel);
+  font-size: 0.78rem;
+}
+
+.effects-stack-list li span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.effects-stack-list li button {
+  flex: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.effects-stack-list li button:hover {
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+
+.effects-stack-list li button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.effects-quick-row {
+  margin-top: 0.7rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
+}
+
+.effects-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.effect-chip {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.68rem;
+  cursor: pointer;
+}
+
+.effect-chip:hover {
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+
+.effect-chip.is-active {
+  color: var(--bg);
+  background: var(--cyan);
+  border-color: var(--cyan);
+}
