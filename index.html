@@ -17,6 +17,7 @@
     />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="layout-v2.css" />
+    <link rel="stylesheet" href="cards-v2.css" />
   </head>
   <body>
     <section class="admin-shell" id="adminView" hidden aria-live="polite"></section>
@@ -174,6 +175,23 @@
             </div>
 
             <div class="lab-context" id="labContext">
+              <div class="effects-stack-panel" id="effectsStackPanel">
+                <div class="effects-stack-header">
+                  <span class="tool-label">Active effects <small id="stackCount">(0/5)</small></span>
+                  <button type="button" id="randomizeStackButton">Randomize</button>
+                </div>
+                <p class="effects-stack-empty" id="effectsStackEmpty">Enable an effect card below to build your stack.</p>
+                <ol class="effects-stack-list" id="effectsStackList"></ol>
+                <div class="effects-quick-row" id="favoritesRow" hidden>
+                  <span class="tool-label">★ Favorites</span>
+                  <div class="effects-chip-row" id="favoritesChips"></div>
+                </div>
+                <div class="effects-quick-row" id="recentRow" hidden>
+                  <span class="tool-label">Recent</span>
+                  <div class="effects-chip-row" id="recentChips"></div>
+                </div>
+              </div>
+
               <div data-category="essentials" hidden>
                 <p class="category-panel-title">Essentials</p>
                 <div class="tool-section">
@@ -219,9 +237,16 @@
 
                 <p class="category-panel-title">Film &amp; Light</p>
 
-                <details class="tool-section">
-                  <summary><span class="tool-label" data-search-label="Halation">Halation / Bloom</span><small>Warm glow around bright edges</small></summary>
-                  <label class="toggle-line"><input id="haloEnable" type="checkbox" /> Enable</label>
+                <details class="tool-section effect-card" data-effect-key="halo">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="halo"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Halation">Halation / Bloom</strong>
+                      <small>Warm glow around bright edges</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="halo" aria-label="Favorite Halation / Bloom" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="haloEnable" type="checkbox" class="effect-enable" /> Enable</label>
                   <div class="control-grid">
                     <label>Strength<input id="haloStrength" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
                     <label>Radius<input id="haloRadius" type="range" min="1" max="30" step="1" value="10" /></label>
@@ -229,9 +254,16 @@
                   </div>
                 </details>
 
-                <details class="tool-section">
-                  <summary><span class="tool-label" data-search-label="Light Leak">Light Leak</span><small>Directional edge leak</small></summary>
-                  <label class="toggle-line"><input id="leak2Enable" type="checkbox" /> Enable</label>
+                <details class="tool-section effect-card" data-effect-key="leak2">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="leak2"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Light Leak">Light Leak</strong>
+                      <small>Directional edge leak</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="leak2" aria-label="Favorite Light Leak" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="leak2Enable" type="checkbox" class="effect-enable" /> Enable</label>
                   <div class="control-grid">
                     <label>Strength<input id="leak2Strength" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
                     <label>Angle<input id="leak2Angle" type="range" min="0" max="360" step="1" value="45" /></label>
@@ -240,27 +272,48 @@
                   </div>
                 </details>
 
-                <details class="tool-section">
-                  <summary><span class="tool-label" data-search-label="Bleach Bypass">Overexposure / Bleach Bypass</span><small>Crushed highlights, punchy contrast</small></summary>
-                  <label class="toggle-line"><input id="bleachEnable" type="checkbox" /> Enable</label>
+                <details class="tool-section effect-card" data-effect-key="bleach">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="bleach"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Bleach Bypass">Overexposure / Bleach Bypass</strong>
+                      <small>Crushed highlights, punchy contrast</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="bleach" aria-label="Favorite Overexposure / Bleach Bypass" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="bleachEnable" type="checkbox" class="effect-enable" /> Enable</label>
                   <div class="control-grid">
                     <label>Strength<input id="bleachStrength" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
                     <label>Recovery<input id="bleachRecovery" type="range" min="0" max="1" step="0.01" value="0.3" /></label>
                   </div>
                 </details>
 
-                <details class="tool-section">
-                  <summary><span class="tool-label" data-search-label="Orton Glow">Dreamy Glow / Orton</span><small>Soft focus overlay</small></summary>
-                  <label class="toggle-line"><input id="ortonEnable" type="checkbox" /> Enable</label>
+                <details class="tool-section effect-card" data-effect-key="orton">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="orton"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Orton Glow">Dreamy Glow / Orton</strong>
+                      <small>Soft focus overlay</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="orton" aria-label="Favorite Dreamy Glow / Orton" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="ortonEnable" type="checkbox" class="effect-enable" /> Enable</label>
                   <div class="control-grid">
                     <label>Amount<input id="ortonAmount" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
                     <label>Blur radius<input id="ortonBlur" type="range" min="1" max="24" step="1" value="8" /></label>
                   </div>
                 </details>
 
-                <details class="tool-section">
-                  <summary><span class="tool-label" data-search-label="Ethereal Diffusion">Ethereal Diffusion</span><small>"Not really here" softness</small></summary>
-                  <label class="toggle-line"><input id="diffuseEnable" type="checkbox" /> Enable</label>
+                <details class="tool-section effect-card" data-effect-key="diffuse">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="diffuse"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Ethereal Diffusion">Ethereal Diffusion</strong>
+                      <small>"Not really here" softness</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="diffuse" aria-label="Favorite Ethereal Diffusion" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="diffuseEnable" type="checkbox" class="effect-enable" /> Enable</label>
                   <div class="control-grid">
                     <label>Strength<input id="diffuseStrength" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
                     <label>Blur radius<input id="diffuseBlur" type="range" min="1" max="20" step="1" value="6" /></label>
@@ -268,9 +321,16 @@
                   </div>
                 </details>
 
-                <details class="tool-section">
-                  <summary><span class="tool-label" data-search-label="God Rays">Window Light / God Rays</span><small>Directional flare pass</small></summary>
-                  <label class="toggle-line"><input id="godrayEnable" type="checkbox" /> Enable</label>
+                <details class="tool-section effect-card" data-effect-key="godray">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="godray"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="God Rays">Window Light / God Rays</strong>
+                      <small>Directional flare pass</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="godray" aria-label="Favorite Window Light / God Rays" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="godrayEnable" type="checkbox" class="effect-enable" /> Enable</label>
                   <div class="control-grid">
                     <label>Strength<input id="godrayStrength" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
                     <label>Angle<input id="godrayAngle" type="range" min="0" max="360" step="1" value="200" /></label>
@@ -278,9 +338,16 @@
                   </div>
                 </details>
 
-                <details class="tool-section">
-                  <summary><span class="tool-label" data-search-label="Liminal Fog">Liminal Fog / Haze</span><small>Atmospheric color cast</small></summary>
-                  <label class="toggle-line"><input id="fogEnable" type="checkbox" /> Enable</label>
+                <details class="tool-section effect-card" data-effect-key="fog">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="fog"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Liminal Fog">Liminal Fog / Haze</strong>
+                      <small>Atmospheric color cast</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="fog" aria-label="Favorite Liminal Fog / Haze" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="fogEnable" type="checkbox" class="effect-enable" /> Enable</label>
                   <div class="control-grid">
                     <label>Density<input id="fogDensity" type="range" min="0" max="1" step="0.01" value="0.3" /></label>
                     <label>Tint<input id="fogTint" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
@@ -339,36 +406,64 @@
 
                 <p class="category-panel-title">Glitch &amp; Fracture</p>
 
-                <details class="tool-section">
-                  <summary><span class="tool-label" data-search-label="Prism Shatter">Digital Fracture / Prism Shatter</span><small>Channel split + displacement cracks</small></summary>
-                  <label class="toggle-line"><input id="fractureEnable" type="checkbox" /> Enable</label>
+                <details class="tool-section effect-card" data-effect-key="fracture">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="fracture"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Prism Shatter">Digital Fracture / Prism Shatter</strong>
+                      <small>Channel split + displacement cracks</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="fracture" aria-label="Favorite Digital Fracture / Prism Shatter" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="fractureEnable" type="checkbox" class="effect-enable" /> Enable</label>
                   <div class="control-grid">
                     <label>Intensity<input id="fractureIntensity" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
                     <label>Complexity<input id="fractureComplexity" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
                   </div>
                 </details>
 
-                <details class="tool-section">
-                  <summary><span class="tool-label" data-search-label="Chromatic Bloom">Chromatic Aberration (enhanced)</span><small>Extra radial color fringe</small></summary>
-                  <label class="toggle-line"><input id="chromaBoostEnable" type="checkbox" /> Enable</label>
+                <details class="tool-section effect-card" data-effect-key="chromaBoost">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="chromaBoost"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Chromatic Bloom">Chromatic Aberration (enhanced)</strong>
+                      <small>Extra radial color fringe</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="chromaBoost" aria-label="Favorite Chromatic Aberration (enhanced)" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="chromaBoostEnable" type="checkbox" class="effect-enable" /> Enable</label>
                   <div class="control-grid">
                     <label>Strength<input id="chromaBoostStrength" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
                   </div>
                   <label class="toggle-line"><input id="chromaBoostFlicker" type="checkbox" /> Flicker on remix</label>
                 </details>
 
-                <details class="tool-section">
-                  <summary><span class="tool-label" data-search-label="Signal Tear">Signal Tear / Datamosh</span><small>Blocky compression glitches</small></summary>
-                  <label class="toggle-line"><input id="tearEnable" type="checkbox" /> Enable</label>
+                <details class="tool-section effect-card" data-effect-key="tear">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="tear"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Signal Tear">Signal Tear / Datamosh</strong>
+                      <small>Blocky compression glitches</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="tear" aria-label="Favorite Signal Tear / Datamosh" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="tearEnable" type="checkbox" class="effect-enable" /> Enable</label>
                   <div class="control-grid">
                     <label>Intensity<input id="tearIntensity" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
                     <label>Block size<input id="tearBlock" type="range" min="2" max="24" step="1" value="8" /></label>
                   </div>
                 </details>
 
-                <details class="tool-section">
-                  <summary><span class="tool-label" data-search-label="Spectral Shift">Spectral Shift</span><small>RGB channel offset with bleed</small></summary>
-                  <label class="toggle-line"><input id="spectralEnable" type="checkbox" /> Enable</label>
+                <details class="tool-section effect-card" data-effect-key="spectral">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="spectral"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Spectral Shift">Spectral Shift</strong>
+                      <small>RGB channel offset with bleed</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="spectral" aria-label="Favorite Spectral Shift" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="spectralEnable" type="checkbox" class="effect-enable" /> Enable</label>
                   <div class="control-grid">
                     <label>Amount<input id="spectralAmount" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
                     <label>Bleed<input id="spectralBleed" type="range" min="0.5" max="8" step="0.5" value="2" /></label>
@@ -475,5 +570,6 @@
     <script src="app.js" defer></script>
     <script src="layout.js" defer></script>
     <script src="effects-v2.js" defer></script>
+    <script src="cards-v2.js" defer></script>
   </body>
 </html>
