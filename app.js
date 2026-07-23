@@ -1135,6 +1135,7 @@ function renderSourceToCanvas(source, canvas, params = DEFAULT_PARAMS, seed = 20
   outputContext.putImageData(applyArtifactPixels(artifactData, params, seed + 31), 0, 0);
   applyCreativeEffect(canvas, params, seed + 47);
   if (typeof window.applyAlamsDumpExtraEffects === 'function') window.applyAlamsDumpExtraEffects(canvas, seed + 61);
+  if (typeof window.alamsDumpCaptureCleanFrame === 'function') window.alamsDumpCaptureCleanFrame(canvas);
   drawTimestamp(canvas, params.timestampDate ? new Date(params.timestampDate) : new Date(), params.stampName);
 }
 
