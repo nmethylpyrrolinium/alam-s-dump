@@ -190,6 +190,10 @@
                   <span class="tool-label">Recent</span>
                   <div class="effects-chip-row" id="recentChips"></div>
                 </div>
+                <div class="effects-quick-row">
+                  <span class="tool-label">Combo presets</span>
+                  <div class="effects-chip-row" id="creativePresetRow"></div>
+                </div>
               </div>
 
               <div data-category="essentials" hidden>
@@ -233,7 +237,8 @@
                   <label data-search-label="Grain">Grain<input id="grainControl" type="range" min="0" max="32" step="1" value="17" /></label>
                   <label data-search-label="Heat leak">Heat leak<input id="leakControl" type="range" min="0" max="0.5" step="0.01" value="0.08" /></label>
                 </div>
-                <p class="category-empty-state">Named film stocks (Portra, Ektar, Tri-X, Cinestill, and the rest) land with the next update — the recipes above are the current stand-ins.</p>
+                <p class="category-empty-state">Named film stocks below are curated look-alikes built from these sliders — not measured, licensed color-science LUTs.</p>
+                <div class="effects-chip-row" id="filmStockPresetRow"></div>
 
                 <p class="category-panel-title">Film &amp; Light</p>
 
@@ -358,12 +363,216 @@
 
               <div data-category="pixel" hidden>
                 <p class="category-panel-title">Pixel &amp; Digital</p>
-                <p class="category-empty-state">8-bit, pixel mosaic, LCD pixel, and nearest-neighbor upscale effects are landing in the next update.</p>
+
+                <details class="tool-section effect-card" data-effect-key="sprite8">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="sprite8"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="8-bit Sprite">8-bit Sprite</strong><small>Chunky blocks, tiny palette</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="sprite8" aria-label="Favorite 8-bit Sprite" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="sprite8Enable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Block size<input id="sprite8Block" type="range" min="4" max="24" step="1" value="10" /></label>
+                    <label>Palette<input id="sprite8Palette" type="range" min="2" max="8" step="1" value="4" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="sprite16">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="sprite16"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="16-bit Sprite">16-bit Sprite</strong><small>Finer blocks, richer palette</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="sprite16" aria-label="Favorite 16-bit Sprite" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="sprite16Enable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Block size<input id="sprite16Block" type="range" min="2" max="14" step="1" value="6" /></label>
+                    <label>Palette<input id="sprite16Palette" type="range" min="4" max="16" step="1" value="8" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="fatPixel">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="fatPixel"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Fat Pixel">Fat Pixel</strong><small>Very large flat blocks</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="fatPixel" aria-label="Favorite Fat Pixel" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="fatPixelEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Block size<input id="fatPixelBlock" type="range" min="10" max="48" step="1" value="16" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="bootlegPixel">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="bootlegPixel"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Bootleg Pixel">Bootleg Pixel</strong><small>Off-palette cartridge look</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="bootlegPixel" aria-label="Favorite Bootleg Pixel" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="bootlegPixelEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Block size<input id="bootlegPixelBlock" type="range" min="4" max="20" step="1" value="10" /></label>
+                    <label>Palette<input id="bootlegPixelPalette" type="range" min="2" max="8" step="1" value="5" /></label>
+                    <label>Hue skew<input id="bootlegPixelHue" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="pixelMosaic">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="pixelMosaic"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Pixel Mosaic">Pixel Mosaic</strong><small>Pixelation with tile gaps</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="pixelMosaic" aria-label="Favorite Pixel Mosaic" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="pixelMosaicEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Block size<input id="pixelMosaicBlock" type="range" min="6" max="30" step="1" value="12" /></label>
+                    <label>Gap strength<input id="pixelMosaicGap" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="lcdPixel">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="lcdPixel"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="LCD Pixel">LCD Pixel</strong><small>RGB subpixel screen grid</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="lcdPixel" aria-label="Favorite LCD Pixel" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="lcdPixelEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Block size<input id="lcdPixelBlock" type="range" min="4" max="16" step="1" value="8" /></label>
+                    <label>Grid strength<input id="lcdPixelGrid" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="pixelStretch">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="pixelStretch"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Pixel Stretch">Pixel Stretch</strong><small>Random row stretch glitch</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="pixelStretch" aria-label="Favorite Pixel Stretch" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="pixelStretchEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Intensity<input id="pixelStretchIntensity" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="nnUpscale">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="nnUpscale"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Nearest Neighbor Upscale">Nearest Neighbor Upscale</strong><small>Blocky low-res upscale</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="nnUpscale" aria-label="Favorite Nearest Neighbor Upscale" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="nnUpscaleEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Downscale<input id="nnUpscaleBlock" type="range" min="2" max="20" step="1" value="8" /></label>
+                  </div>
+                </details>
               </div>
 
               <div data-category="print" hidden>
                 <p class="category-panel-title">Print &amp; Analog</p>
-                <p class="category-empty-state">Halftone, risograph, newspaper print, and CMYK effects are landing in the next update.</p>
+
+                <details class="tool-section effect-card" data-effect-key="halftonePrint">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="halftonePrint"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Halftone Print">Halftone Print</strong><small>Classic dot-pattern print</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="halftonePrint" aria-label="Favorite Halftone Print" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="halftonePrintEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Dot size<input id="halftonePrintCell" type="range" min="3" max="16" step="1" value="6" /></label>
+                    <label>Angle<input id="halftonePrintAngle" type="range" min="0" max="90" step="1" value="45" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="newspaperPrint">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="newspaperPrint"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Newspaper Print">Newspaper Print</strong><small>Grayscale halftone + paper tint</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="newspaperPrint" aria-label="Favorite Newspaper Print" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="newspaperPrintEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Dot size<input id="newspaperPrintCell" type="range" min="3" max="14" step="1" value="5" /></label>
+                    <label>Paper tint<input id="newspaperPrintTint" type="range" min="0" max="1" step="0.01" value="0.25" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="comicPrint">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="comicPrint"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Comic Print">Comic Print</strong><small>Posterized + halftone edges</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="comicPrint" aria-label="Favorite Comic Print" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="comicPrintEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Dot size<input id="comicPrintCell" type="range" min="3" max="14" step="1" value="6" /></label>
+                    <label>Levels<input id="comicPrintLevels" type="range" min="2" max="8" step="1" value="5" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="cmykPrint">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="cmykPrint"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="CMYK Print">CMYK Print</strong><small>Plate split + misregistration</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="cmykPrint" aria-label="Favorite CMYK Print" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="cmykPrintEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Misregistration<input id="cmykPrintMisreg" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                    <label>Ink strength<input id="cmykPrintInk" type="range" min="0" max="1" step="0.01" value="0.6" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="risograph">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="risograph"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Risograph">Risograph</strong><small>Duotone + grainy misprint</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="risograph" aria-label="Favorite Risograph" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="risographEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Misregistration<input id="risographMisreg" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                    <label>Tint strength<input id="risographTint" type="range" min="0" max="1" step="0.01" value="0.6" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="screenPrint">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="screenPrint"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Screen Print">Screen Print</strong><small>Posterized ink layers</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="screenPrint" aria-label="Favorite Screen Print" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="screenPrintEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Softness<input id="screenPrintCell" type="range" min="2" max="16" step="1" value="8" /></label>
+                    <label>Levels<input id="screenPrintLevels" type="range" min="2" max="8" step="1" value="5" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="offsetPrint">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="offsetPrint"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Offset Print">Offset Print</strong><small>CMYK + halftone rosette</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="offsetPrint" aria-label="Favorite Offset Print" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="offsetPrintEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Dot size<input id="offsetPrintCell" type="range" min="3" max="14" step="1" value="6" /></label>
+                    <label>Misregistration<input id="offsetPrintMisreg" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="inkBleed">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="inkBleed"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Ink Bleed">Ink Bleed</strong><small>Soft spreading ink edges</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="inkBleed" aria-label="Favorite Ink Bleed" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="inkBleedEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Spread<input id="inkBleedSpread" type="range" min="0.5" max="8" step="0.5" value="2" /></label>
+                    <label>Strength<input id="inkBleedStrength" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                  </div>
+                </details>
               </div>
 
               <div data-category="retro" hidden>
@@ -382,6 +591,80 @@
                   <label data-search-label="Dither">Dither<input id="ditherControl" type="range" min="0" max="14" step="1" value="7" /></label>
                   <label data-search-label="Scan field">Scan field<input id="scanlineControl" type="range" min="0" max="0.2" step="0.01" value="0.055" /></label>
                 </div>
+
+                <details class="tool-section effect-card" data-effect-key="ascii">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="ascii"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="ASCII">ASCII</strong><small>Luminance mapped to characters</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="ascii" aria-label="Favorite ASCII" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="asciiEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Cell size<input id="asciiCell" type="range" min="5" max="18" step="1" value="9" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="ansi">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="ansi"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="ANSI">ANSI</strong><small>16-color terminal blocks</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="ansi" aria-label="Favorite ANSI" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="ansiEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Cell size<input id="ansiCell" type="range" min="4" max="16" step="1" value="8" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="terminal">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="terminal"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Terminal">Terminal</strong><small>Phosphor monochrome glow</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="terminal" aria-label="Favorite Terminal" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="terminalEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Glow<input id="terminalGlow" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Phosphor<input id="terminalPhosphor" type="range" min="0" max="1" step="1" value="0" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="teletext">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="teletext"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Teletext">Teletext</strong><small>Blocky low-res color cells</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="teletext" aria-label="Favorite Teletext" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="teletextEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Cell size<input id="teletextCell" type="range" min="6" max="20" step="1" value="10" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="floydSteinberg">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="floydSteinberg"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Floyd-Steinberg">Floyd-Steinberg</strong><small>Error-diffusion dithering</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="floydSteinberg" aria-label="Favorite Floyd-Steinberg" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="floydSteinbergEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Levels<input id="floydSteinbergLevels" type="range" min="2" max="6" step="1" value="3" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="dotMatrix">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="dotMatrix"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="Dot Matrix">Dot Matrix</strong><small>Print-head dot grid</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="dotMatrix" aria-label="Favorite Dot Matrix" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="dotMatrixEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Cell size<input id="dotMatrixCell" type="range" min="3" max="12" step="1" value="6" /></label>
+                    <label>Strength<input id="dotMatrixStrength" type="range" min="0" max="1" step="0.01" value="0.7" /></label>
+                  </div>
+                </details>
               </div>
 
               <div data-category="artistic" hidden>
@@ -477,12 +760,60 @@
                 <div class="control-grid">
                   <label data-search-label="Cyan shadow">Cyan shadow<input id="cyanControl" type="range" min="0" max="0.16" step="0.005" value="0.075" /></label>
                 </div>
-                <p class="category-empty-state">Full HSL, curves, levels, and white balance land with the Color &amp; Tone update.</p>
+
+                <p class="category-panel-title">HSL</p>
+                <div class="control-grid">
+                  <label data-search-label="Hue">Hue<input id="hueControl" type="range" min="-180" max="180" step="1" value="0" /></label>
+                  <label data-search-label="Saturation">Saturation<input id="saturationControl" type="range" min="-1" max="1" step="0.01" value="0" /></label>
+                  <label data-search-label="Lightness">Lightness<input id="lightnessControl" type="range" min="-0.3" max="0.3" step="0.01" value="0" /></label>
+                </div>
+
+                <p class="category-panel-title">Tone curve</p>
+                <div class="control-grid">
+                  <label data-search-label="Curve shadows">Shadows<input id="curveShadowsControl" type="range" min="-0.3" max="0.3" step="0.01" value="0" /></label>
+                  <label data-search-label="Curve mids">Mids<input id="curveMidsControl" type="range" min="-0.3" max="0.3" step="0.01" value="0" /></label>
+                  <label data-search-label="Curve highlights">Highlights<input id="curveHighlightsControl" type="range" min="-0.3" max="0.3" step="0.01" value="0" /></label>
+                </div>
+
+                <p class="category-panel-title">Levels</p>
+                <div class="control-grid">
+                  <label data-search-label="Levels black">Black point<input id="levelsBlackControl" type="range" min="0" max="0.3" step="0.005" value="0" /></label>
+                  <label data-search-label="Levels white">White point<input id="levelsWhiteControl" type="range" min="0.7" max="1" step="0.005" value="1" /></label>
+                  <label data-search-label="Levels gamma">Gamma<input id="levelsGammaControl" type="range" min="0.5" max="2" step="0.01" value="1" /></label>
+                </div>
+
+                <p class="category-panel-title">White balance</p>
+                <div class="control-grid">
+                  <label data-search-label="White balance temperature">Temperature<input id="whiteBalanceTempControl" type="range" min="-1" max="1" step="0.01" value="0" /></label>
+                  <label data-search-label="White balance tint">Tint<input id="whiteBalanceTintControl" type="range" min="-1" max="1" step="0.01" value="0" /></label>
+                </div>
+
+                <p class="category-panel-title">Vibrance &amp; region tone</p>
+                <div class="control-grid">
+                  <label data-search-label="Vibrance">Vibrance<input id="vibranceControl" type="range" min="0" max="1" step="0.01" value="0" /></label>
+                  <label data-search-label="Shadows">Shadows<input id="shadowsControl" type="range" min="-0.3" max="0.3" step="0.01" value="0" /></label>
+                  <label data-search-label="Highlights">Highlights<input id="highlightsControl" type="range" min="-0.3" max="0.3" step="0.01" value="0" /></label>
+                </div>
               </div>
 
               <div data-category="export" hidden>
                 <p class="category-panel-title">Export</p>
-                <p class="category-empty-state">PNG/WEBP export, a quality slider, and a metadata toggle land with the Export update. JPEG export works today from the buttons above the canvas.</p>
+                <div class="tool-section">
+                  <label>Format
+                    <select id="exportFormatSelect">
+                      <option value="jpg">JPG</option>
+                      <option value="png">PNG</option>
+                      <option value="webp">WEBP</option>
+                    </select>
+                  </label>
+                  <label class="inline-range">Quality <span id="exportQualityValue">90%</span><input id="exportQualityControl" type="range" min="0.3" max="1" step="0.01" value="0.9" /></label>
+                  <label class="toggle-line"><input id="exportMetadataToggle" type="checkbox" checked /> Include timestamp metadata</label>
+                  <label class="toggle-line"><input id="exportTransparentToggle" type="checkbox" /> Transparent background (PNG only)</label>
+                  <small>Transparency only shows where the crop doesn't fully cover the frame — with the current crop tool that's rare, so this mostly matters once non-filling crops are supported.</small>
+                  <button id="exportV2Button" type="button">Export image</button>
+                  <p class="admin-feedback" id="exportV2Status" role="status"></p>
+                </div>
+                <p class="category-empty-state">JPEG export also still works from the button above the canvas.</p>
                 <details class="export-optional">
                   <summary>Compare four versions</summary>
                   <div class="contact-sheet-tool">
@@ -570,6 +901,11 @@
     <script src="app.js" defer></script>
     <script src="layout.js" defer></script>
     <script src="effects-v2.js" defer></script>
+    <script src="pixel-print-v2.js" defer></script>
+    <script src="retro-v2.js" defer></script>
+    <script src="color-v2.js" defer></script>
+    <script src="presets-v2.js" defer></script>
+    <script src="export-v2.js" defer></script>
     <script src="cards-v2.js" defer></script>
   </body>
 </html>

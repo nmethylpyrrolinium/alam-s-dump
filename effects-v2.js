@@ -308,6 +308,7 @@
   window.AlamsDumpEffectDefs = EFFECT_DEFS;
 
   window.applyAlamsDumpExtraEffects = function applyAlamsDumpExtraEffects(canvas, seed) {
+    if (typeof window.alamsDumpApplyColorGrade === 'function') window.alamsDumpApplyColorGrade(canvas);
     const order = Array.isArray(window.alamsDumpEffectOrder) && window.alamsDumpEffectOrder.length
       ? window.alamsDumpEffectOrder.filter((key) => EFFECT_DEFS[key])
       : DEFAULT_ORDER;
