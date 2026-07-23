@@ -31,13 +31,37 @@
   color: var(--cyan);
 }
 
+/* ---- Give the editor the width it needs -------------------------------
+   The original .lab section is a 2-column grid (upload copy | editor
+   card), sized around a single control stack. The new sidebar/center/
+   context layout needs much more horizontal room, so on the .lab section
+   specifically we drop to a single column: the upload intro sits in a
+   compact strip on top, the editor card (still .lab-panel, still gets
+   all of styles.css's existing card/padding/responsive rules for free)
+   spans full width below it. Nothing in styles.css is touched — this is
+   a higher-specificity override living in this file only. */
+.lab.lab--v2 {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.lab.lab--v2 .lab-copy {
+  position: static;
+  max-width: 46rem;
+}
+
 /* ---- Shell: sidebar / center / context ------------------------------ */
 .lab-shell {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr) 280px;
+  grid-template-rows: auto 1fr;
   gap: 1.25rem;
   align-items: start;
 }
+
+.lab-sidebar { grid-column: 1; grid-row: 1 / 3; }
+.effects-stack-panel { grid-column: 3; grid-row: 1; }
+.lab-center { grid-column: 2; grid-row: 1 / 3; }
+.lab-context { grid-column: 3; grid-row: 2; }
 
 .lab-topbar {
   grid-column: 1 / -1;
@@ -278,9 +302,13 @@
 @media (max-width: 920px) {
   .lab-shell {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
   }
 
   .lab-sidebar {
+    grid-column: 1;
+    grid-row: auto;
+    order: 1;
     position: static;
     grid-auto-flow: column;
     grid-auto-columns: max-content;
@@ -288,7 +316,22 @@
     gap: 0.4rem;
   }
 
+  .effects-stack-panel {
+    grid-column: 1;
+    grid-row: auto;
+    order: 2;
+  }
+
+  .lab-center {
+    grid-column: 1;
+    grid-row: auto;
+    order: 3;
+  }
+
   .lab-context {
+    grid-column: 1;
+    grid-row: auto;
+    order: 4;
     position: static;
     max-height: none;
   }
