@@ -284,11 +284,12 @@
 
     /* --------------------------- Thumbnails --------------------------- */
 
-    function regenerateThumbnails() {
+    function regenerateThumbnails(scope) {
       const output = document.getElementById('outputCanvas');
       const registry = defs();
       if (!output || !output.width || !output.height) return;
-      document.querySelectorAll('[data-thumb-for]').forEach((thumbCanvas) => {
+      const root = scope || document;
+      root.querySelectorAll('[data-thumb-for]').forEach((thumbCanvas) => {
         const def = registry[thumbCanvas.dataset.thumbFor];
         if (!def) return;
         const work = document.createElement('canvas');
@@ -306,14 +307,30 @@
       });
     }
 
+    function activeCategoryPanel() {
+      return document.querySelector('#labContext [data-category]:not([hidden])') || document;
+    }
+
     let thumbTimer = 0;
-    const scheduleThumbs = () => {
+    const scheduleThumbs = (event) => {
+      // Only bother if the change happened inside a card (a slider or an
+      // Enable toggle) — typing in the search box or the timestamp name
+      // field shouldn't trigger a canvas-heavy thumbnail pass.
+      if (!event.target.closest?.('[data-effect-key]')) return;
       window.clearTimeout(thumbTimer);
-      thumbTimer = window.setTimeout(regenerateThumbnails, 260);
+      thumbTimer = window.setTimeout(() => regenerateThumbnails(activeCategoryPanel()), 400);
     };
     document.addEventListener('input', scheduleThumbs);
     document.addEventListener('change', scheduleThumbs);
-    window.setInterval(regenerateThumbnails, 1500);
-    window.setTimeout(regenerateThumbnails, 900);
+
+    // Refresh only the newly-visible category's thumbnails when switching —
+    // not the other seven categories' worth of cards sitting hidden.
+    document.querySelectorAll('[data-category-nav]').forEach((button) => {
+      button.addEventListener('click', () => {
+        window.setTimeout(() => regenerateThumbnails(activeCategoryPanel()), 120);
+      });
+    });
+
+    window.setTimeout(() => regenerateThumbnails(activeCategoryPanel()), 900);
   });
 })();

@@ -174,28 +174,39 @@
               </div>
             </div>
 
-            <div class="lab-context" id="labContext">
-              <div class="effects-stack-panel" id="effectsStackPanel">
-                <div class="effects-stack-header">
-                  <span class="tool-label">Active effects <small id="stackCount">(0/5)</small></span>
-                  <button type="button" id="randomizeStackButton">Randomize</button>
-                </div>
-                <p class="effects-stack-empty" id="effectsStackEmpty">Enable an effect card below to build your stack.</p>
-                <ol class="effects-stack-list" id="effectsStackList"></ol>
-                <div class="effects-quick-row" id="favoritesRow" hidden>
-                  <span class="tool-label">★ Favorites</span>
-                  <div class="effects-chip-row" id="favoritesChips"></div>
-                </div>
-                <div class="effects-quick-row" id="recentRow" hidden>
-                  <span class="tool-label">Recent</span>
-                  <div class="effects-chip-row" id="recentChips"></div>
-                </div>
-                <div class="effects-quick-row">
-                  <span class="tool-label">Combo presets</span>
-                  <div class="effects-chip-row" id="creativePresetRow"></div>
+            <div class="effects-stack-panel" id="effectsStackPanel">
+              <div class="effects-stack-header">
+                <span class="tool-label">Active effects <small id="stackCount">(0/5)</small></span>
+                <button type="button" id="randomizeStackButton">Randomize</button>
+              </div>
+              <p class="effects-stack-empty" id="effectsStackEmpty">Enable an effect card below to build your stack.</p>
+              <ol class="effects-stack-list" id="effectsStackList"></ol>
+              <div class="effects-quick-row" id="favoritesRow" hidden>
+                <span class="tool-label">★ Favorites</span>
+                <div class="effects-chip-row" id="favoritesChips"></div>
+              </div>
+              <div class="effects-quick-row" id="recentRow" hidden>
+                <span class="tool-label">Recent</span>
+                <div class="effects-chip-row" id="recentChips"></div>
+              </div>
+              <div class="effects-quick-row">
+                <span class="tool-label">Combo presets</span>
+                <div class="effects-chip-row" id="creativePresetRow"></div>
+              </div>
+              <div class="effects-quick-row">
+                <span class="tool-label">Quick export</span>
+                <div class="quick-export-row">
+                  <select id="quickExportFormatSelect" aria-label="Quick export format">
+                    <option value="jpg">JPG</option>
+                    <option value="png">PNG</option>
+                    <option value="webp">WEBP</option>
+                  </select>
+                  <button id="quickExportButton" type="button">Export</button>
                 </div>
               </div>
+            </div>
 
+            <div class="lab-context" id="labContext">
               <div data-category="essentials" hidden>
                 <p class="category-panel-title">Essentials</p>
                 <div class="tool-section">
@@ -357,6 +368,39 @@
                     <label>Density<input id="fogDensity" type="range" min="0" max="1" step="0.01" value="0.3" /></label>
                     <label>Tint<input id="fogTint" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
                     <label>Falloff<input id="fogFalloff" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="toyCamera">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="toyCamera"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Toy Camera">Toy Camera / Lomo</strong>
+                      <small>Heavy vignette + saturated quirks</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="toyCamera" aria-label="Favorite Toy Camera / Lomo" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="toyCameraEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Vignette<input id="toyCameraVignette" type="range" min="0" max="1" step="0.01" value="0.6" /></label>
+                    <label>Saturation<input id="toyCameraSaturation" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Corner leak<input id="toyCameraLeak" type="range" min="0" max="1" step="0.01" value="0.3" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="infrared">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="infrared"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Infrared">Infrared Simulation</strong>
+                      <small>Dreamy B&amp;W with glow</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="infrared" aria-label="Favorite Infrared Simulation" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="infraredEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Strength<input id="infraredStrength" type="range" min="0" max="1" step="0.01" value="0.8" /></label>
+                    <label>Glow<input id="infraredGlow" type="range" min="0" max="1" step="0.01" value="0.3" /></label>
                   </div>
                 </details>
               </div>
@@ -665,6 +709,20 @@
                     <label>Strength<input id="dotMatrixStrength" type="range" min="0" max="1" step="0.01" value="0.7" /></label>
                   </div>
                 </details>
+
+                <details class="tool-section effect-card" data-effect-key="vhsAnalog">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="vhsAnalog"></canvas></span>
+                    <span class="effect-card-copy"><strong data-search-label="VHS Analog">VHS / Analog Video</strong><small>Tracking lines + color bleed</small></span>
+                    <button type="button" class="effect-card-star" data-favorite-key="vhsAnalog" aria-label="Favorite VHS / Analog Video" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="vhsAnalogEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Tracking<input id="vhsAnalogTracking" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Color bleed<input id="vhsAnalogBleed" type="range" min="0" max="1" step="0.01" value="0.4" /></label>
+                    <label>Noise<input id="vhsAnalogNoise" type="range" min="0" max="1" step="0.01" value="0.3" /></label>
+                  </div>
+                </details>
               </div>
 
               <div data-category="artistic" hidden>
@@ -751,6 +809,22 @@
                     <label>Amount<input id="spectralAmount" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
                     <label>Bleed<input id="spectralBleed" type="range" min="0.5" max="8" step="0.5" value="2" /></label>
                     <label>Angle<input id="spectralAngle" type="range" min="0" max="360" step="1" value="0" /></label>
+                  </div>
+                </details>
+
+                <details class="tool-section effect-card" data-effect-key="posterizeSolarize">
+                  <summary>
+                    <span class="effect-card-thumb"><canvas width="56" height="56" data-thumb-for="posterizeSolarize"></canvas></span>
+                    <span class="effect-card-copy">
+                      <strong data-search-label="Posterize Solarize">Posterize + Solarize</strong>
+                      <small>Flattened levels, inverted highlights</small>
+                    </span>
+                    <button type="button" class="effect-card-star" data-favorite-key="posterizeSolarize" aria-label="Favorite Posterize + Solarize" aria-pressed="false">★</button>
+                  </summary>
+                  <label class="toggle-line"><input id="posterizeSolarizeEnable" type="checkbox" class="effect-enable" /> Enable</label>
+                  <div class="control-grid">
+                    <label>Levels<input id="posterizeSolarizeLevels" type="range" min="2" max="8" step="1" value="5" /></label>
+                    <label>Solarize threshold<input id="posterizeSolarizeThreshold" type="range" min="0.3" max="1" step="0.01" value="0.7" /></label>
                   </div>
                 </details>
               </div>
@@ -906,6 +980,7 @@
     <script src="color-v2.js" defer></script>
     <script src="presets-v2.js" defer></script>
     <script src="export-v2.js" defer></script>
+    <script src="extras-v2.js" defer></script>
     <script src="cards-v2.js" defer></script>
   </body>
 </html>

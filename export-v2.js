@@ -70,5 +70,17 @@
     formatSelect?.addEventListener('change', () => {
       if (qualityInput) qualityInput.disabled = formatSelect.value === 'png';
     });
+
+    const quickSelect = document.getElementById('quickExportFormatSelect');
+    const quickButton = document.getElementById('quickExportButton');
+    quickButton?.addEventListener('click', () => {
+      const outputCanvas = document.getElementById('outputCanvas');
+      if (!outputCanvas) return;
+      const format = quickSelect?.value || 'jpg';
+      const mime = MIME_TYPES[format] || 'image/jpeg';
+      outputCanvas.toBlob((blob) => {
+        if (blob) triggerDownload(blob, EXTENSIONS[format] || 'jpg');
+      }, mime, format === 'png' ? undefined : 0.9);
+    });
   });
 })();

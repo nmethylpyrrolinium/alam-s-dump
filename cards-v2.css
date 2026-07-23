@@ -219,3 +219,35 @@
   background: var(--cyan);
   border-color: var(--cyan);
 }
+
+.quick-export-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.quick-export-row select {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  background: var(--panel);
+  color: var(--ink);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+}
+
+.quick-export-row button {
+  flex: none;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--cyan);
+  border-radius: 0.6rem;
+  background: var(--cyan);
+  color: var(--bg);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
