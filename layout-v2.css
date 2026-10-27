@@ -374,3 +374,42 @@
     display: none;
   }
 }
+/* ---- Memory Index and passport controls ------------------------------- */
+.memory-index-panel {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(84, 243, 255, 0.25);
+  border-radius: 1rem;
+  background: linear-gradient(145deg, rgba(84, 243, 255, 0.055), rgba(10, 14, 22, 0.82));
+}
+.memory-index-panel .category-panel-title { margin: 0; color: var(--cyan); }
+.memory-index-panel label, .passport-import-label {
+  color: var(--muted);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.memory-index-panel select, .memory-index-panel input {
+  width: 100%; min-width: 0; padding: 0.5rem 0.6rem;
+  border: 1px solid var(--line); border-radius: 0.55rem;
+  background: #090d14; color: var(--ink); font: inherit; font-size: 0.76rem;
+}
+.memory-index-intro, .memory-index-status {
+  margin: 0; color: var(--muted); font-size: 0.74rem; line-height: 1.45;
+}
+.memory-index-status[data-state="error"] { color: #ff9b9b; }
+.memory-index-actions { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.memory-index-actions button, .memory-index-save button, .memory-clear-button, #passportApplyButton {
+  padding: 0.45rem 0.6rem; border: 1px solid var(--line); border-radius: 0.55rem;
+  background: var(--panel); color: var(--ink); font: inherit; font-size: 0.68rem; cursor: pointer;
+}
+.memory-index-actions button:hover:not(:disabled), .memory-index-save button:hover:not(:disabled),
+.memory-clear-button:hover, #passportApplyButton:hover:not(:disabled) { border-color: var(--cyan); color: var(--cyan); }
+.memory-index-actions button:disabled, .memory-index-save button:disabled, #passportApplyButton:disabled { opacity: 0.45; cursor: not-allowed; }
+.memory-index-save { display: grid; gap: 0.45rem; margin-top: 0.25rem; }
+.memory-index-save button { border-color: var(--cyan); color: var(--cyan); }
+.memory-clear-button { justify-self: start; color: #ffb6a8; }
+.memory-index-panel :focus-visible, .passport-import-label:focus-visible, #passportApplyButton:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+#passportImportInput { max-width: 100%; color: var(--muted); font-size: 0.7rem; }
