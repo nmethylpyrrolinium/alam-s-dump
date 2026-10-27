@@ -1343,6 +1343,8 @@ function initialize() {
   let hasUserImage = false;
   let loadRequestId = 0;
   let activeObjectUrl = null;
+  let activeMemorySourceId = null;
+  let initialMemoryRecipe = null;
 
   const setStatus = (message, state = '') => {
     if (!uploadStatus) return;
@@ -1400,13 +1402,14 @@ function initialize() {
     renderUserEdit(immediate);
   };
 
-  const loadImageFile = (file) => {
-    if (!file) return;
+  const loadImageFile = (file, memorySourceId = null) => {
+    if (!file) return Promise.resolve(false);
     if (!isSupportedImageFile(file)) {
       setStatus('That file is not an image. Try a JPG, PNG, WebP, or another browser-supported image.', 'error');
-      return;
+      return Promise.resolve(false);
     }
 
+    return new Promise((resolve) => {
     const requestId = ++loadRequestId;
     if (activeObjectUrl) URL.revokeObjectURL(activeObjectUrl);
     const url = URL.createObjectURL(file);
@@ -1422,13 +1425,18 @@ function initialize() {
     image.onload = () => {
       if (requestId !== loadRequestId) {
         finishRequest();
+        resolve(false);
         return;
       }
+      let loaded = false;
       try {
         activeFileName = (file.name || 'camera-photo').replace(/\.[^.]+$/, '').replace(/[^a-z0-9-_]+/gi, '-').toLowerCase();
         renderSeed = Math.max(1, Math.floor(file.lastModified || Date.now()) % 2147483647);
         hasUserImage = true;
+        activeMemorySourceId = memorySourceId || crypto.randomUUID();
         renderAll(image, true);
+        window.alamsDumpMemorySourceReady?.({ id: activeMemorySourceId, blob: file, name: file.name || 'saved-photo', width: image.naturalWidth, height: image.naturalHeight });
+        loaded = true;
         document.getElementById('featureAsk')?.removeAttribute('hidden');
         setStatus(`${file.name || 'Camera photo'} is in the dump. Adjust it, remix the grain, then save or share.`, 'success');
       } catch (error) {
@@ -1436,6 +1444,7 @@ function initialize() {
         setStatus('This image opened but could not be rendered. Try a smaller JPG, PNG, or WebP file.', 'error');
       } finally {
         finishRequest();
+        resolve(loaded);
       }
     };
     image.onerror = () => {
@@ -1443,10 +1452,64 @@ function initialize() {
         setStatus('This image could not be decoded by your browser. Convert HEIC/RAW files to JPG or PNG and try again.', 'error');
       }
       finishRequest();
+      resolve(false);
     };
     image.src = url;
+    });
   };
 
+  window.alamsDumpLoadMemorySource = (file, sourceId) => loadImageFile(file, sourceId);
+  window.alamsDumpCaptureRecipe = () => ({
+    schemaVersion: 1,
+    controls: [...document.querySelectorAll('#labContext input[id], #labContext select[id], #labContext textarea[id]')]
+      .filter((el) => el.type !== 'file' && !el.classList.contains('memory-control'))
+      .map((el) => ({ id: el.id, type: el.type || (el.tagName === 'SELECT' ? 'select-one' : 'text'), value: el.value, checked: !!el.checked })),
+    active: {
+      crop: document.querySelector('[data-crop].active')?.dataset.crop || null,
+      motion: document.querySelector('[data-motion].active')?.dataset.motion || null,
+      effect: document.querySelector('[data-effect].active')?.dataset.effect || null,
+      preset: document.querySelector('[data-preset].active')?.dataset.preset || null,
+    },
+    effectOrder: Array.isArray(window.alamsDumpEffectOrder) ? window.alamsDumpEffectOrder.slice() : [],
+    renderSeed,
+  });
+  window.alamsDumpApplyRecipe = async (rawRecipe) => {
+    const recipe = window.AlamsDumpMemoryCore?.validateRecipe(rawRecipe);
+    if (!recipe) throw new Error('Edit recipe support is unavailable.');
+    recipe.controls.forEach((saved) => {
+      const el = document.getElementById(saved.id);
+      if (!el || !document.getElementById('labContext')?.contains(el)) return;
+      if (el.type === 'range' || el.type === 'number') {
+        const numeric = Number(saved.value);
+        if (!Number.isFinite(numeric) || (el.min !== '' && numeric < Number(el.min)) || (el.max !== '' && numeric > Number(el.max))) {
+          throw new RangeError(`Saved value for ${saved.id} is outside the control's range.`);
+        }
+      }
+      if (el.tagName === 'SELECT' && ![...el.options].some((option) => option.value === saved.value)) {
+        throw new RangeError(`Saved option for ${saved.id} is not available.`);
+      }
+      if (el.type === 'checkbox' || el.type === 'radio') el.checked = saved.checked;
+      else el.value = saved.value;
+      const eventType = el.type === 'checkbox' || el.type === 'radio' || el.tagName === 'SELECT' ? 'change' : 'input';
+      el.dispatchEvent(new Event(eventType, { bubbles: true }));
+    });
+    [['crop', recipe.active.crop], ['motion', recipe.active.motion], ['effect', recipe.active.effect], ['preset', recipe.active.preset]].forEach(([key, value]) => {
+      if (value == null) return;
+      document.querySelectorAll(`[data-${key}]`).forEach((button) => button.classList.toggle('active', button.dataset[key] === value));
+    });
+    if (typeof window.alamsDumpSetEffectOrder === 'function') window.alamsDumpSetEffectOrder(recipe.effectOrder);
+    else window.alamsDumpEffectOrder = recipe.effectOrder.slice();
+    renderSeed = recipe.renderSeed;
+    const nowToggle = document.getElementById('timestampNow');
+    const customTimestamp = document.getElementById('customTimestamp');
+    if (customTimestamp && nowToggle) customTimestamp.disabled = nowToggle.checked;
+    window.alamsDumpRerender?.();
+    return true;
+  };
+  window.alamsDumpResetRecipe = async () => {
+    if (!initialMemoryRecipe) throw new Error('The editor has not finished initializing.');
+    return window.alamsDumpApplyRecipe(JSON.parse(JSON.stringify(initialMemoryRecipe)));
+  };
 
   const lab = document.getElementById('lab');
   if ('IntersectionObserver' in window && lab) {
@@ -1676,6 +1739,8 @@ function initialize() {
     document.getElementById('featureAsk').hidden = true;
     setStatus('Kept private.', 'success');
   });
+
+  initialMemoryRecipe = window.alamsDumpCaptureRecipe();
 
   const reveals = document.querySelectorAll('.reveal-on-scroll');
   if ('IntersectionObserver' in window) {
