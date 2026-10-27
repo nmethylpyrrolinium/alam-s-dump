@@ -220,6 +220,27 @@
                   </div>
                   <label class="inline-range">Position <input id="cropPositionControl" type="range" min="0" max="1" step="0.01" value="0.5" /></label>
                 </div>
+                <section class="memory-index-panel" aria-labelledby="memoryIndexTitle">
+                  <p class="category-panel-title" id="memoryIndexTitle">Memory Index</p>
+                  <p class="memory-index-intro">Save named edit branches on this device. Each original is stored once; branches keep settings, not duplicate images.</p>
+                  <label for="memorySourceSelect">Saved originals</label>
+                  <select class="memory-control" id="memorySourceSelect"><option value="">Choose a saved original…</option></select>
+                  <label for="memoryBranchSelect">Edit versions</label>
+                  <select class="memory-control" id="memoryBranchSelect"><option value="">No saved versions yet</option></select>
+                  <div class="memory-index-actions">
+                    <button type="button" id="memoryOpenSourceButton" disabled>Open saved photo</button>
+                    <button type="button" id="memoryRenameButton" disabled>Rename</button>
+                    <button type="button" id="memoryDeleteBranchButton" disabled>Delete version</button>
+                    <button type="button" id="memoryReturnOriginalButton">Return to original</button>
+                  </div>
+                  <form id="memorySaveBranchForm" class="memory-index-save">
+                    <label for="memoryBranchName">New branch name</label>
+                    <input class="memory-control" id="memoryBranchName" type="text" maxlength="64" placeholder="e.g. drawer scan / softer" required />
+                    <button type="submit" id="memorySaveBranchButton" disabled>Save as new version</button>
+                  </form>
+                  <button type="button" class="memory-clear-button" id="memoryClearButton">Remove all local project data</button>
+                  <p id="memoryIndexStatus" class="memory-index-status" role="status" aria-live="polite">Load a photo to save its original and begin branching.</p>
+                </section>
                 <div class="control-grid">
                   <label data-search-label="Noise cancellation">Noise cancellation<input id="noiseCancelControl" type="range" min="0" max="1" step="0.01" value="0.48" /></label>
                   <label data-search-label="Sharpness">Sharpness<input id="sharpnessControl" type="range" min="0" max="1.6" step="0.01" value="0.78" /></label>
@@ -884,8 +905,13 @@
                   <label class="toggle-line"><input id="exportMetadataToggle" type="checkbox" checked /> Include timestamp metadata</label>
                   <label class="toggle-line"><input id="exportTransparentToggle" type="checkbox" /> Transparent background (PNG only)</label>
                   <small>Transparency only shows where the crop doesn't fully cover the frame — with the current crop tool that's rare, so this mostly matters once non-filling crops are supported.</small>
-                  <button id="exportV2Button" type="button">Export image</button>
-                  <p class="admin-feedback" id="exportV2Status" role="status"></p>
+                  <label class="toggle-line"><input id="passportTimestampToggle" type="checkbox" /> Include export time in passport</label>
+                  <button id="exportV2Button" type="button">Export image + passport</button>
+                  <label class="passport-import-label" for="passportImportInput">Validate or import a passport</label>
+                  <input id="passportImportInput" type="file" accept="application/json,.json" />
+                  <button id="passportApplyButton" type="button" disabled>Apply passport recipe</button>
+                  <p id="passportImportStatus" class="admin-feedback" role="status" aria-live="polite">Passport contains edit settings and export details, never the source photo.</p>
+                  <p class="admin-feedback" id="exportV2Status" role="status" aria-live="polite"></p>
                 </div>
                 <p class="category-empty-state">JPEG export also still works from the button above the canvas.</p>
                 <details class="export-optional">
@@ -973,6 +999,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js" defer></script>
+    <script src="memory-index-core.js" defer></script>
+    <script src="passport-core.js" defer></script>
+    <script src="memory-index.js" defer></script>
     <script src="layout.js" defer></script>
     <script src="effects-v2.js" defer></script>
     <script src="pixel-print-v2.js" defer></script>
