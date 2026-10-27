@@ -118,6 +118,14 @@
     updateCardStates(active);
   }
 
+  window.alamsDumpSetEffectOrder = function alamsDumpSetEffectOrder(order) {
+    const enabled = activeKeys();
+    const requested = Array.isArray(order) ? order.filter((key, index) => defs()[key] && enabled.includes(key) && order.indexOf(key) === index) : [];
+    state.order = requested.concat(enabled.filter((key) => !requested.includes(key)));
+    renderStack();
+    persist();
+  };
+
   function renderChips() {
     const favoritesRow = document.getElementById('favoritesRow');
     const favoritesChips = document.getElementById('favoritesChips');
