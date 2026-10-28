@@ -319,3 +319,4 @@
     rangeIds.forEach((id) => document.getElementById(id)?.addEventListener('input', rerender));
   });
 })();
+
