@@ -342,3 +342,4 @@
     toggleIds.forEach((id) => document.getElementById(id)?.addEventListener('change', rerender));
   });
 })();
+
