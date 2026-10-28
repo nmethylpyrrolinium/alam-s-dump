@@ -155,33 +155,13 @@
 
   /* --------------------------- Print & Analog --------------------------- */
 
-  function halftoneDots(canvas, cell, angleDeg, ink) {
+  function halftoneDots(canvas, cell, angleDeg, ink, paper = [248, 246, 240], preserveColor = false) {
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    const { width, height } = canvas;
-    const source = ctx.getImageData(0, 0, width, height).data;
-    const angle = (angleDeg * Math.PI) / 180;
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
-    ctx.save();
-    ctx.fillStyle = `rgb(${ink[0]}, ${ink[1]}, ${ink[2]})`;
-    ctx.fillRect(0, 0, width, height);
-    ctx.globalCompositeOperation = 'destination-out';
-    for (let y = 0; y < height; y += cell) {
-      for (let x = 0; x < width; x += cell) {
-        const sx = clamp(Math.round(x + cell / 2), 0, width - 1);
-        const sy = clamp(Math.round(y + cell / 2), 0, height - 1);
-        const idx = (sy * width + sx) * 4;
-        const l = luma(source[idx] / 255, source[idx + 1] / 255, source[idx + 2] / 255);
-        const radius = (1 - l) * cell * 0.62;
-        if (radius <= 0.3) continue;
-        const cx = x + cell / 2 + (cos - sin) * 0;
-        const cy = y + cell / 2 + (sin + cos) * 0;
-        ctx.beginPath();
-        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-    ctx.restore();
+    const source = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const printCore = window.AlamsDumpPrintCore;
+    if (!printCore?.renderHalftone) throw new Error('Print renderer is unavailable.');
+    const dots = printCore.renderHalftone(source, cell, angleDeg, ink, paper);
+    ctx.putImageData(preserveColor ? printCore.compositeDarkDots(source, dots) : dots, 0, 0);
   }
 
   function applyHalftonePrint(canvas, cell, angle) {
@@ -197,13 +177,13 @@
         data[i + 2] = l;
       }
     });
-    halftoneDots(canvas, cell, 45, [20, 16, 12]);
-    const ctx = canvas.getContext('2d');
-    ctx.save();
-    ctx.globalCompositeOperation = 'multiply';
-    ctx.fillStyle = `rgba(233, 221, 194, ${1 - clamp01(tint)})`;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
+    const warmth = clamp01(tint);
+    const paper = [
+      Math.round(250 - warmth * 28),
+      Math.round(248 - warmth * 30),
+      Math.round(242 - warmth * 43),
+    ];
+    halftoneDots(canvas, cell, 45, [20, 16, 12], paper);
   }
 
   function applyComicPrint(canvas, cell, posterizeLevels) {
@@ -214,13 +194,9 @@
         data[i + 2] = quantizeStep(data[i + 2], posterizeLevels);
       }
     });
-    halftoneDots(canvas, cell, 15, [255, 250, 240]);
-    const ctx = canvas.getContext('2d');
-    ctx.save();
-    ctx.globalCompositeOperation = 'multiply';
-    ctx.globalAlpha = 0.5;
-    ctx.drawImage(canvas, 0, 0);
-    ctx.restore();
+    // Keep the posterized palette as the paper color and lay dark screen dots
+    // over it, rather than replacing the comic image with a transparent mask.
+    halftoneDots(canvas, cell, 15, [24, 20, 24], [250, 247, 238], true);
   }
 
   function applyCmykPrint(canvas, misregistration, inkStrength) {
@@ -287,7 +263,7 @@
 
   function applyOffsetPrint(canvas, cell, misregistration) {
     applyCmykPrint(canvas, misregistration, 0.7);
-    halftoneDots(canvas, cell, 22, [10, 10, 10]);
+    halftoneDots(canvas, cell, 22, [10, 10, 10], [244, 241, 232]);
   }
 
   function applyInkBleed(canvas, spread, strength) {
