@@ -1328,6 +1328,9 @@ function isSupportedImageFile(file) {
 function initialize() {
   if (appInitialized) return;
   appInitialized = true;
+  if (new URLSearchParams(window.location.search).get('debug') === '1') {
+    document.querySelectorAll('[data-dev-only]').forEach((panel) => { panel.hidden = false; });
+  }
   const outputCanvas = document.getElementById('outputCanvas');
   const sourcePreviewCanvas = document.getElementById('sourceCanvas');
   const uploadStatus = document.getElementById('uploadStatus');
