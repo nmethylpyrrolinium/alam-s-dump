@@ -4,7 +4,7 @@
   "private": true,
   "description": "A private-feeling browser photo lab for restoring and styling digital keepsakes.",
   "scripts": {
-    "test": "node --check app.js && node --check layout.js && node --check effects-v2.js && node --check pixel-print-v2.js && node --check retro-v2.js && node --check color-v2.js && node --check presets-v2.js && node --check export-v2.js && node --check extras-v2.js && node --check cards-v2.js && node --check memory-index-core.js && node --check memory-index.js && node --check passport-core.js && node tests/photon-signature.test.js && node tests/admin-moderation-wiring.test.js && node tests/memory-index.test.js && node tests/artifact-passport.test.js",
+    "test": "node --check app.js && node --check layout.js && node --check effects-v2.js && node --check print-core.js && node --check pixel-print-v2.js && node --check retro-v2.js && node --check color-v2.js && node --check presets-v2.js && node --check export-v2.js && node --check extras-v2.js && node --check cards-v2.js && node --check memory-index-core.js && node --check memory-index.js && node --check passport-core.js && node tests/photon-signature.test.js && node tests/admin-moderation-wiring.test.js && node tests/memory-index.test.js && node tests/artifact-passport.test.js && node tests/print-effects.test.js",
     "serve": "python3 -m http.server 4173"
   }
 }

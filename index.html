@@ -139,13 +139,13 @@
 
           <div class="lab-shell">
             <nav class="lab-sidebar" aria-label="Effect categories">
-              <button class="category-nav-item" type="button" data-category-nav="essentials">Essentials</button>
-              <button class="category-nav-item" type="button" data-category-nav="film">Film Cameras</button>
-              <button class="category-nav-item" type="button" data-category-nav="pixel">Pixel &amp; Digital</button>
-              <button class="category-nav-item" type="button" data-category-nav="print">Print &amp; Analog</button>
-              <button class="category-nav-item" type="button" data-category-nav="retro">Retro &amp; CRT</button>
-              <button class="category-nav-item" type="button" data-category-nav="artistic">Artistic</button>
-              <button class="category-nav-item" type="button" data-category-nav="color">Color &amp; Tone</button>
+              <button class="category-nav-item" type="button" data-category-nav="essentials">Camera &amp; Light</button>
+              <button class="category-nav-item" type="button" data-category-nav="film">Film &amp; Archive</button>
+              <button class="category-nav-item" type="button" data-category-nav="pixel">Pixels &amp; Screens</button>
+              <button class="category-nav-item" type="button" data-category-nav="print">Print &amp; Paper</button>
+              <button class="category-nav-item" type="button" data-category-nav="retro">Signal &amp; Glitch</button>
+              <button class="category-nav-item" type="button" data-category-nav="artistic">Experimental</button>
+              <button class="category-nav-item" type="button" data-category-nav="color">Colour &amp; Tone</button>
               <button class="category-nav-item" type="button" data-category-nav="export">Export</button>
             </nav>
 
@@ -823,11 +823,11 @@
                       <strong data-search-label="Spectral Shift">Spectral Shift</strong>
                       <small>RGB channel offset with bleed</small>
                     </span>
-                    <button type="button" class="effect-card-star" data-favorite-key="spectral" aria-label="Favorite Spectral Shift" aria-pressed="false">★</button>
+                  <button type="button" class="effect-card-star" data-favorite-key="spectral" aria-label="Favorite Spectral Shift" aria-pressed="false">★</button>
                   </summary>
                   <label class="toggle-line"><input id="spectralEnable" type="checkbox" class="effect-enable" /> Enable</label>
                   <div class="control-grid">
-                    <label>Amount<input id="spectralAmount" type="range" min="0" max="1" step="0.01" value="0.35" /></label>
+                    <label>Amount<input id="spectralAmount" type="range" min="0" max="1" step="0.01" value="0.18" /></label>
                     <label>Bleed<input id="spectralBleed" type="range" min="0.5" max="8" step="0.5" value="2" /></label>
                     <label>Angle<input id="spectralAngle" type="range" min="0" max="360" step="1" value="0" /></label>
                   </div>
@@ -922,7 +922,7 @@
                   </div>
                   <canvas id="contactSheetCanvas" width="880" height="1200" hidden></canvas>
                 </details>
-                <details class="export-optional">
+                <details class="export-optional" data-dev-only hidden>
                   <summary>Diagnostics</summary>
                   <div class="signature-panel" aria-live="polite">
                     <div>
@@ -937,8 +937,8 @@
           </div>
 
           <div class="feature-ask" id="featureAsk" hidden>
-            <div><strong>Hang this on the public wall?</strong><small>Your edited image is checked first, then posted publicly. No sign-in needed.</small></div>
-            <div><button id="featureYes" type="button">Approve &amp; hang</button><button id="featureNo" type="button">Keep private</button></div>
+            <div><strong>Post this edit to the public wall?</strong><small>Your edited image is sent to Alam’s Dump for moderation and may be shown publicly if accepted. No sign-in needed.</small></div>
+            <div><button id="featureYes" type="button">Post to Public Wall</button><button id="featureNo" type="button">Keep private</button></div>
           </div>
         </div>
       </section>
@@ -1004,6 +1004,7 @@
     <script src="memory-index.js" defer></script>
     <script src="layout.js" defer></script>
     <script src="effects-v2.js" defer></script>
+    <script src="print-core.js" defer></script>
     <script src="pixel-print-v2.js" defer></script>
     <script src="retro-v2.js" defer></script>
     <script src="color-v2.js" defer></script>

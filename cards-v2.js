@@ -224,6 +224,10 @@
         renderStack();
         renderChips();
         persist();
+        // The stack UI and local recipe are not the renderer. Route every
+        // accepted toggle through the single debounced render API so effects
+        // without their own legacy checkbox listeners update immediately.
+        window.alamsDumpRerender?.();
       });
     });
 

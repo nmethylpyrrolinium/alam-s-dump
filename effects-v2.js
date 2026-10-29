@@ -297,7 +297,7 @@
     fracture: { enabledId: 'fractureEnable', run: (canvas, seed) => applyPrismShatter(canvas, num('fractureIntensity', 0.4), num('fractureComplexity', 0.5), seed + 3) },
     chromaBoost: { enabledId: 'chromaBoostEnable', run: (canvas, seed) => applyChromaBoost(canvas, num('chromaBoostStrength', 0.35), bool('chromaBoostFlicker'), seed + 5) },
     tear: { enabledId: 'tearEnable', run: (canvas, seed) => applySignalTear(canvas, num('tearIntensity', 0.4), num('tearBlock', 8), seed + 7) },
-    spectral: { enabledId: 'spectralEnable', run: (canvas, seed) => applySpectralShift(canvas, num('spectralAmount', 0.35), num('spectralBleed', 2), num('spectralAngle', 0)) },
+    spectral: { enabledId: 'spectralEnable', run: (canvas, seed) => applySpectralShift(canvas, num('spectralAmount', 0.18), num('spectralBleed', 2), num('spectralAngle', 0)) },
   };
 
   const DEFAULT_ORDER = Object.keys(EFFECT_DEFS);
@@ -342,3 +342,4 @@
     toggleIds.forEach((id) => document.getElementById(id)?.addEventListener('change', rerender));
   });
 })();
+
