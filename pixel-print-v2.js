@@ -155,13 +155,14 @@
 
   /* --------------------------- Print & Analog --------------------------- */
 
-  function halftoneDots(canvas, cell, angleDeg, ink, paper = [248, 246, 240], preserveColor = false) {
+  function halftoneDots(canvas, cell, angleDeg, ink, paper = [248, 246, 240]) {
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     const source = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const printCore = window.AlamsDumpPrintCore;
     if (!printCore?.renderHalftone) throw new Error('Print renderer is unavailable.');
     const dots = printCore.renderHalftone(source, cell, angleDeg, ink, paper);
-    ctx.putImageData(preserveColor ? printCore.compositeDarkDots(source, dots) : dots, 0, 0);
+    const imageData = new ImageData(new Uint8ClampedArray(dots.data), dots.width, dots.height);
+    ctx.putImageData(imageData, 0, 0);
   }
 
   function applyHalftonePrint(canvas, cell, angle) {
@@ -194,9 +195,8 @@
         data[i + 2] = quantizeStep(data[i + 2], posterizeLevels);
       }
     });
-    // Keep the posterized palette as the paper color and lay dark screen dots
-    // over it, rather than replacing the comic image with a transparent mask.
-    halftoneDots(canvas, cell, 15, [24, 20, 24], [250, 247, 238], true);
+    // Print the posterized luminance with dark ink on cream paper.
+    halftoneDots(canvas, cell, 15, [20, 16, 12], [255, 250, 240]);
   }
 
   function applyCmykPrint(canvas, misregistration, inkStrength) {

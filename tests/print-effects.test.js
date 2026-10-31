@@ -41,17 +41,24 @@ const unrotated = printCore.renderHalftone(gradient, 9, 0, ink, paper);
 const angled = printCore.renderHalftone(gradient, 9, 37, ink, paper);
 assert.notDeepEqual(angled.data, unrotated.data, 'screen angle changes the sampled dot registration');
 
-const colored = image(96, 64, (x, y) => [80 + x, 30 + y * 2, 120, (x + y) % 4 ? 255 : 150]);
-const dots = printCore.renderHalftone(colored, 8, 22, ink, [255, 255, 255]);
-const comic = printCore.compositeDarkDots(colored, dots);
-assert.ok(comic.data[0] > comic.data[2] - 100, 'comic halftone keeps its underlying color palette');
-assert.equal(comic.data[3], colored.data[3], 'color-preserving print keeps source alpha');
+assert.ok(meanLuma(brightPrint) > 0.55 * 255, 'white-dominant print remains above 0.55 mean luminance');
+for (let i = 0; i < brightPrint.data.length; i += 4) {
+  assert.equal(brightPrint.data[i], paper[0], 'pure-white samples do not receive an antialias ink fringe');
+  assert.equal(brightPrint.data[i + 1], paper[1]);
+  assert.equal(brightPrint.data[i + 2], paper[2]);
+  assert.equal(brightPrint.data[i + 3], 255, 'paper output remains fully opaque');
+}
 assert.throws(() => printCore.renderHalftone(null, 8, 0, ink, paper), /valid RGBA/);
 
 const cards = fs.readFileSync('cards-v2.js', 'utf8');
 const html = fs.readFileSync('index.html', 'utf8');
+const pixel = fs.readFileSync('pixel-print-v2.js', 'utf8');
 const registries = ['effects-v2.js', 'pixel-print-v2.js', 'extras-v2.js'].map((file) => fs.readFileSync(file, 'utf8')).join('\n');
 assert.match(cards, /persist\(\);[\s\S]*window\.alamsDumpRerender\?\.\(\);/, 'every accepted card toggle persists and queues a render');
+assert.match(pixel, /new ImageData\(new Uint8ClampedArray\(dots\.data\), dots\.width, dots\.height\)/, 'Canvas receives a native ImageData instance');
+assert.doesNotMatch(fs.readFileSync('app.js', 'utf8'), /runLocalImageSafetyCheck/, 'the always-allow local moderation stub is removed');
+assert.match(fs.readFileSync('app.js', 'utf8'), /p_filter_status: serverVerdict\.status \|\| 'hold'/, 'missing server moderation status fails closed');
+assert.match(fs.readFileSync('app.js', 'utf8'), /Thanks — your photo is waiting for review and will appear on the wall if it’s accepted\./, 'held submissions use the required status message');
 for (const effect of ['halo', 'toyCamera', 'sprite16', 'halftonePrint', 'vhsAnalog', 'posterizeSolarize', 'spectral']) {
   assert.match(html, new RegExp(`data-effect-key="${effect}"`), `${effect} is visible in the library`);
   assert.match(registries, new RegExp(`${effect}:\\s*\\{`), `${effect} has an effect registry entry`);
@@ -63,3 +70,4 @@ assert.match(html, /Post to Public Wall/, 'the public submission action states t
 assert.doesNotMatch(html, /Approve &amp; hang/, 'wall submission is not described as an approval action');
 assert.ok(html.indexOf('src="print-core.js"') < html.indexOf('src="pixel-print-v2.js"'), 'pure print core loads before its effect module');
 console.log('print effect tests passed');
+

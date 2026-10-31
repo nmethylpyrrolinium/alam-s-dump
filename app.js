@@ -222,17 +222,6 @@ async function checkWallImage(blob) {
   }
 }
 
-async function runLocalImageSafetyCheck(canvas) {
-  // Keep this function easy to upgrade later with a browser-side image safety model.
-  // For now return allowed. Later we can plug a model here before uploading.
-  return {
-    allowed: true,
-    status: 'allowed',
-    score: 0,
-    labels: { localCheck: 'placeholder' },
-  };
-}
-
 function appendLocalWallPreview() {
   const outputCanvas = document.getElementById('outputCanvas');
   if (!outputCanvas) return;
@@ -1681,13 +1670,12 @@ function initialize() {
 
     setStatus('Checking image before hanging…', 'loading');
 
-    const localVerdict = await runLocalImageSafetyCheck(outputCanvas);
-    if (!localVerdict.allowed) {
-      setStatus('This image cannot be posted on the public wall.', 'error');
+    const serverVerdict = await checkWallImage(blob);
+    if (serverVerdict.status === 'hold') {
+      document.getElementById('featureAsk').hidden = true;
+      setStatus('Thanks — your photo is waiting for review and will appear on the wall if it’s accepted.', 'success');
       return;
     }
-
-    const serverVerdict = await checkWallImage(blob);
     if (!serverVerdict.allowed) {
       setStatus(serverVerdict.reason || 'This image cannot be posted on the public wall.', 'error');
       return;
@@ -1715,11 +1703,11 @@ function initialize() {
       p_caption: params.stampName || 'Alam’s Dump',
       p_guest_name: params.stampName || 'guest',
       p_effect_recipe: params,
-      p_filter_status: serverVerdict.status || 'allowed',
+      p_filter_status: serverVerdict.status || 'hold',
       p_filter_score: serverVerdict.score || 0,
       p_visitor_id: getVisitorId(),
       p_filter_labels: {
-        local: localVerdict.labels || {},
+        local: {},
         server: serverVerdict.labels || {},
       },
     });
