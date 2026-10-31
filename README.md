@@ -4,7 +4,7 @@ Alam’s Dump is a browser-based keepsake lab for cleaning up a photo, trying a 
 
 ## Current features
 
-- Crop, tone, color, noise reduction, sharpening, grain, dither, optics, pixel/print, retro, glitch, and fracture controls.
+- 28 focused effect cards across film, pixel, print, retro, and glitch treatments, alongside crop, tone, color, noise reduction, sharpening, and grain controls.
 - Creative and film-style recipes, an active effect stack, favorites, recent effects, and a four-look comparison sheet for one source image.
 - Before/after preview, zoom and pan, JPEG/PNG/WebP export, image sharing where the browser supports it, and optional timestamp artwork.
 - **Memory Index:** stores an uploaded original once in browser IndexedDB and saves named branches as edit-control recipes. Branches can be selected, renamed, deleted with confirmation, or reset to the source. “Remove all local project data” clears Memory Index originals and branches in this browser.
@@ -55,7 +55,7 @@ This is a static page with classic deferred scripts; there is no build step or f
 4. `layout.js` — category navigation, search, before/after, zoom and pan.
 5. `effects-v2.js`, `print-core.js`, `pixel-print-v2.js`, `retro-v2.js`, `color-v2.js`, `presets-v2.js`, `export-v2.js`, `extras-v2.js`, and `cards-v2.js`.
 
-The main render pipeline crops and scales into a bounded working canvas, applies tone and pixel operations, noise reduction and sharpening, then applies optics/damage, creative and registered card effects, and finally the optional timestamp artwork. Effect modules add functions to the shared `window.AlamsDumpEffectDefs` registry and rerender through the single debounced `window.alamsDumpRerender` hook. Print effects use a pure RGB halftone rasterizer that draws opaque ink dots over predictable paper stock; the angle controls rotated screen registration. The comic treatment preserves its posterized colors beneath the dot screen.
+The main render pipeline crops and scales into a bounded working canvas, applies tone and pixel operations, noise reduction and sharpening, then applies optics/damage, creative and registered card effects, and finally the optional timestamp artwork. Effect modules add functions to the shared `window.AlamsDumpEffectDefs` registry and rerender through the single debounced `window.alamsDumpRerender` hook. Print effects use a pure RGB halftone rasterizer that draws opaque ink dots over predictable paper stock; the angle controls rotated screen registration. Comic Print applies posterized luminance as dark ink on cream paper.
 
 ## Run locally
 

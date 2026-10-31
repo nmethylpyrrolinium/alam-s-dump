@@ -1468,6 +1468,10 @@ function initialize() {
   window.alamsDumpApplyRecipe = async (rawRecipe) => {
     const recipe = window.AlamsDumpMemoryCore?.validateRecipe(rawRecipe);
     if (!recipe) throw new Error('Edit recipe support is unavailable.');
+    recipe.effectOrder = window.AlamsDumpMemoryCore.filterKnownEffectOrder(
+      recipe.effectOrder,
+      Object.keys(window.AlamsDumpEffectDefs || {}),
+    );
     recipe.controls.forEach((saved) => {
       const el = document.getElementById(saved.id);
       if (!el || !document.getElementById('labContext')?.contains(el)) return;

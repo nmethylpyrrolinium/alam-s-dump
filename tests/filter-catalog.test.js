@@ -1,0 +1,14 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const expected = ['halo','leak2','bleach','orton','godray','fog','toyCamera','infrared','sprite16','bootlegPixel','pixelMosaic','lcdPixel','halftonePrint','newspaperPrint','comicPrint','cmykPrint','risograph','screenPrint','ascii','ansi','terminal','teletext','floydSteinberg','vhsAnalog','fracture','tear','spectral','posterizeSolarize'];
+const html = fs.readFileSync('index.html', 'utf8');
+const actual = [...html.matchAll(/data-effect-key="([^"]+)"/g)].map((match) => match[1]);
+assert.equal(actual.length, 28, 'the UI contains exactly 28 effect cards');
+assert.deepEqual([...actual].sort(), [...expected].sort(), 'the UI matches the approved 28-effect catalog');
+const implementation = ['effects-v2.js','pixel-print-v2.js','retro-v2.js','extras-v2.js'].map((file) => fs.readFileSync(file,'utf8')).join('\n');
+for (const key of expected) assert.match(implementation, new RegExp(key + ':\\s*\\{'), key + ' remains registered');
+const retired = ['diffuse','sprite8','fatPixel','nnUpscale','pixelStretch','chromaBoost','dotMatrix','offsetPrint','inkBleed'];
+for (const key of retired) assert.doesNotMatch(html + implementation + fs.readFileSync('presets-v2.js','utf8'), new RegExp(key), key + ' is retired from UI and effect code');
+assert.match(html,/data-search-label="Pixel Sprite">Pixel Sprite/);
+assert.match(html,/id="sprite16Palette"[^>]*max="16"/,'the replacement pixel treatment supports a 16-shade palette');
+console.log('filter catalog tests passed');

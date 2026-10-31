@@ -30,6 +30,12 @@
       active: { crop: allowed(active.crop, ['0.75', '1', '0.5625', '1.333333', 'original']), motion: allowed(active.motion, ['still', 'shake', 'ghost', 'trails']), effect: allowed(active.effect, ['classic', 'glitch', 'dispersion', 'neonNoir']), preset: allowed(active.preset, ['reference', 'night', 'heat', 'hardSensor']) },
       effectOrder, renderSeed };
   }
+  function filterKnownEffectOrder(effectOrder, registeredKeys) {
+    const known = new Set(Array.isArray(registeredKeys) ? registeredKeys : []);
+    return Array.isArray(effectOrder)
+      ? [...new Set(effectOrder.filter((key) => typeof key === 'string' && known.has(key)))].slice(0, 5)
+      : [];
+  }
   function migrateRecord(record) {
     if (!record || typeof record !== 'object' || Array.isArray(record)) throw new TypeError('Saved version is corrupt.');
     if (record.schemaVersion === SCHEMA_VERSION) return { ...record, recipe: validateRecipe(record.recipe) };
@@ -42,7 +48,7 @@
     if (existingNames.some((item) => String(item).trim().toLocaleLowerCase() === normalizedName.toLocaleLowerCase())) throw new Error('A version with that name already exists for this photo. Choose another name.');
     return { id: id || (root.crypto?.randomUUID ? root.crypto.randomUUID() : `branch-${Date.now()}-${Math.random().toString(16).slice(2)}`), sourceId, name: normalizedName, schemaVersion: SCHEMA_VERSION, recipe: validateRecipe(recipe), createdAt: createdAt || new Date().toISOString() };
   }
-  const api = { SCHEMA_VERSION, MAX_NAME_LENGTH, normalizeName, validateRecipe, migrateRecord, makeBranch };
+  const api = { SCHEMA_VERSION, MAX_NAME_LENGTH, normalizeName, validateRecipe, filterKnownEffectOrder, migrateRecord, makeBranch };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   if (root) root.AlamsDumpMemoryCore = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

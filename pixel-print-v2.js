@@ -44,17 +44,6 @@
 
   /* --------------------------- Pixel & Digital --------------------------- */
 
-  function apply8BitSprite(canvas, blockSize, paletteSize) {
-    pixelate(canvas, blockSize);
-    withImageData(canvas, (data) => {
-      for (let i = 0; i < data.length; i += 4) {
-        data[i] = quantizeStep(data[i], paletteSize);
-        data[i + 1] = quantizeStep(data[i + 1], paletteSize);
-        data[i + 2] = quantizeStep(data[i + 2], paletteSize);
-      }
-    });
-  }
-
   function apply16BitSprite(canvas, blockSize, paletteSize) {
     pixelate(canvas, blockSize);
     withImageData(canvas, (data) => {
@@ -64,10 +53,6 @@
         data[i + 2] = quantizeStep(data[i + 2], paletteSize);
       }
     });
-  }
-
-  function applyFatPixel(canvas, blockSize) {
-    pixelate(canvas, blockSize);
   }
 
   function applyBootlegPixel(canvas, blockSize, paletteSize, hueShift) {
@@ -129,28 +114,6 @@
       }
     }
     ctx.restore();
-  }
-
-  function applyPixelStretch(canvas, intensity, seed) {
-    if (intensity <= 0) return;
-    const ctx = canvas.getContext('2d');
-    const { width, height } = canvas;
-    const copy = document.createElement('canvas');
-    copy.width = width;
-    copy.height = height;
-    copy.getContext('2d').drawImage(canvas, 0, 0);
-    const rand = seededRandom(seed);
-    const rows = Math.max(1, Math.round(intensity * 12));
-    for (let i = 0; i < rows; i += 1) {
-      const y = Math.floor(rand() * height);
-      const rowH = Math.max(1, Math.floor(rand() * 3) + 1);
-      const stretchTo = Math.floor(rowH + rand() * height * 0.12 * intensity);
-      ctx.drawImage(copy, 0, y, width, rowH, 0, y, width, stretchTo);
-    }
-  }
-
-  function applyNearestNeighborUpscale(canvas, downscaleFactor) {
-    pixelate(canvas, downscaleFactor);
   }
 
   /* --------------------------- Print & Analog --------------------------- */
@@ -261,36 +224,13 @@
     ctx.restore();
   }
 
-  function applyOffsetPrint(canvas, cell, misregistration) {
-    applyCmykPrint(canvas, misregistration, 0.7);
-    halftoneDots(canvas, cell, 22, [10, 10, 10], [244, 241, 232]);
-  }
-
-  function applyInkBleed(canvas, spread, strength) {
-    const ctx = canvas.getContext('2d');
-    const copy = document.createElement('canvas');
-    copy.width = canvas.width;
-    copy.height = canvas.height;
-    copy.getContext('2d').drawImage(canvas, 0, 0);
-    ctx.save();
-    ctx.globalCompositeOperation = 'darken';
-    ctx.filter = `blur(${Math.max(0.5, spread)}px)`;
-    ctx.globalAlpha = clamp01(strength);
-    ctx.drawImage(copy, 0, 0);
-    ctx.restore();
-  }
-
   /* ------------------------------ Registry ------------------------------ */
 
   const NEW_DEFS = {
-    sprite8: { enabledId: 'sprite8Enable', run: (canvas) => apply8BitSprite(canvas, num('sprite8Block', 10), num('sprite8Palette', 4)) },
     sprite16: { enabledId: 'sprite16Enable', run: (canvas) => apply16BitSprite(canvas, num('sprite16Block', 6), num('sprite16Palette', 8)) },
-    fatPixel: { enabledId: 'fatPixelEnable', run: (canvas) => applyFatPixel(canvas, num('fatPixelBlock', 16)) },
     bootlegPixel: { enabledId: 'bootlegPixelEnable', run: (canvas) => applyBootlegPixel(canvas, num('bootlegPixelBlock', 10), num('bootlegPixelPalette', 5), num('bootlegPixelHue', 0.4)) },
     pixelMosaic: { enabledId: 'pixelMosaicEnable', run: (canvas) => applyPixelMosaic(canvas, num('pixelMosaicBlock', 12), num('pixelMosaicGap', 0.4)) },
     lcdPixel: { enabledId: 'lcdPixelEnable', run: (canvas) => applyLcdPixel(canvas, num('lcdPixelBlock', 8), num('lcdPixelGrid', 0.5)) },
-    pixelStretch: { enabledId: 'pixelStretchEnable', run: (canvas, seed) => applyPixelStretch(canvas, num('pixelStretchIntensity', 0.4), seed + 11) },
-    nnUpscale: { enabledId: 'nnUpscaleEnable', run: (canvas) => applyNearestNeighborUpscale(canvas, num('nnUpscaleBlock', 8)) },
 
     halftonePrint: { enabledId: 'halftonePrintEnable', run: (canvas) => applyHalftonePrint(canvas, num('halftonePrintCell', 6), num('halftonePrintAngle', 45)) },
     newspaperPrint: { enabledId: 'newspaperPrintEnable', run: (canvas) => applyNewspaperPrint(canvas, num('newspaperPrintCell', 5), num('newspaperPrintTint', 0.25)) },
@@ -298,22 +238,18 @@
     cmykPrint: { enabledId: 'cmykPrintEnable', run: (canvas) => applyCmykPrint(canvas, num('cmykPrintMisreg', 0.5), num('cmykPrintInk', 0.6)) },
     risograph: { enabledId: 'risographEnable', run: (canvas) => applyRisograph(canvas, num('risographMisreg', 0.5), num('risographTint', 0.6)) },
     screenPrint: { enabledId: 'screenPrintEnable', run: (canvas) => applyScreenPrint(canvas, num('screenPrintCell', 8), num('screenPrintLevels', 5)) },
-    offsetPrint: { enabledId: 'offsetPrintEnable', run: (canvas) => applyOffsetPrint(canvas, num('offsetPrintCell', 6), num('offsetPrintMisreg', 0.4)) },
-    inkBleed: { enabledId: 'inkBleedEnable', run: (canvas) => applyInkBleed(canvas, num('inkBleedSpread', 2), num('inkBleedStrength', 0.5)) },
   };
 
   window.AlamsDumpEffectDefs = Object.assign(window.AlamsDumpEffectDefs || {}, NEW_DEFS);
 
   document.addEventListener('DOMContentLoaded', () => {
     const rangeIds = [
-      'sprite8Block', 'sprite8Palette', 'sprite16Block', 'sprite16Palette',
-      'fatPixelBlock', 'bootlegPixelBlock', 'bootlegPixelPalette', 'bootlegPixelHue',
+      'sprite16Block', 'sprite16Palette',
+      'bootlegPixelBlock', 'bootlegPixelPalette', 'bootlegPixelHue',
       'pixelMosaicBlock', 'pixelMosaicGap', 'lcdPixelBlock', 'lcdPixelGrid',
-      'pixelStretchIntensity', 'nnUpscaleBlock',
       'halftonePrintCell', 'halftonePrintAngle', 'newspaperPrintCell', 'newspaperPrintTint',
       'comicPrintCell', 'comicPrintLevels', 'cmykPrintMisreg', 'cmykPrintInk',
       'risographMisreg', 'risographTint', 'screenPrintCell', 'screenPrintLevels',
-      'offsetPrintCell', 'offsetPrintMisreg', 'inkBleedSpread', 'inkBleedStrength',
     ];
     const rerender = () => window.alamsDumpRerender?.();
     rangeIds.forEach((id) => document.getElementById(id)?.addEventListener('input', rerender));
