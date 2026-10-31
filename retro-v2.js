@@ -156,37 +156,12 @@
     ctx.putImageData(imageData, 0, 0);
   }
 
-  function applyDotMatrix(canvas, cell, strength) {
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    const { width, height } = canvas;
-    const source = ctx.getImageData(0, 0, width, height).data;
-    ctx.save();
-    ctx.fillStyle = '#05070d';
-    ctx.globalAlpha = 1;
-    for (let y = 0; y < height; y += cell) {
-      for (let x = 0; x < width; x += cell) {
-        const sx = clamp(Math.round(x + cell / 2), 0, width - 1);
-        const sy = clamp(Math.round(y + cell / 2), 0, height - 1);
-        const idx = (sy * width + sx) * 4;
-        const l = luma(source[idx] / 255, source[idx + 1] / 255, source[idx + 2] / 255);
-        const radius = l * cell * 0.45 * clamp01(strength);
-        if (radius <= 0.3) continue;
-        ctx.beginPath();
-        ctx.arc(x + cell / 2, y + cell / 2, radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgb(${source[idx]}, ${source[idx + 1]}, ${source[idx + 2]})`;
-        ctx.fill();
-      }
-    }
-    ctx.restore();
-  }
-
   const NEW_DEFS = {
     ascii: { enabledId: 'asciiEnable', run: (canvas) => applyAscii(canvas, num('asciiCell', 9), '#54f3ff') },
     ansi: { enabledId: 'ansiEnable', run: (canvas) => applyAnsi(canvas, num('ansiCell', 8)) },
     terminal: { enabledId: 'terminalEnable', run: (canvas) => applyTerminal(canvas, num('terminalGlow', 0.4), num('terminalPhosphor', 0)) },
     teletext: { enabledId: 'teletextEnable', run: (canvas) => applyTeletext(canvas, num('teletextCell', 10)) },
     floydSteinberg: { enabledId: 'floydSteinbergEnable', run: (canvas) => applyFloydSteinberg(canvas, num('floydSteinbergLevels', 3)) },
-    dotMatrix: { enabledId: 'dotMatrixEnable', run: (canvas) => applyDotMatrix(canvas, num('dotMatrixCell', 6), num('dotMatrixStrength', 0.7)) },
   };
 
   window.AlamsDumpEffectDefs = Object.assign(window.AlamsDumpEffectDefs || {}, NEW_DEFS);
@@ -194,7 +169,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     const rangeIds = [
       'asciiCell', 'ansiCell', 'terminalGlow', 'terminalPhosphor',
-      'teletextCell', 'floydSteinbergLevels', 'dotMatrixCell', 'dotMatrixStrength',
+      'teletextCell', 'floydSteinbergLevels',
     ];
     const rerender = () => window.alamsDumpRerender?.();
     rangeIds.forEach((id) => document.getElementById(id)?.addEventListener('input', rerender));

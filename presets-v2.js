@@ -44,18 +44,18 @@
   const CREATIVE_PRESETS = [
     {
       key: 'liminalDream', label: 'Liminal Dream',
-      enable: ['fog', 'halo', 'diffuse'],
-      values: { fogDensity: 0.4, fogTint: 0.35, haloStrength: 0.5, haloWarmth: 0.6, diffuseStrength: 0.4, diffuseBlur: 8 },
+      enable: ['fog', 'halo', 'orton'],
+      values: { fogDensity: 0.4, fogTint: 0.35, haloStrength: 0.5, haloWarmth: 0.6, ortonAmount: 0.55, ortonBlur: 10 },
     },
     {
       key: 'etherealPortrait', label: 'Ethereal Portrait',
-      enable: ['orton', 'diffuse', 'halo'],
-      values: { ortonAmount: 0.45, ortonBlur: 10, diffuseHighlight: 0.65, haloStrength: 0.3, haloWarmth: 0.5 },
+      enable: ['orton', 'halo'],
+      values: { ortonAmount: 0.65, ortonBlur: 12, haloStrength: 0.3, haloWarmth: 0.5 },
     },
     {
       key: 'glitchFracture', label: 'Glitch Fracture',
-      enable: ['fracture', 'chromaBoost', 'tear'],
-      values: { fractureIntensity: 0.5, fractureComplexity: 0.6, chromaBoostStrength: 0.45, tearIntensity: 0.3, tearBlock: 10 },
+      enable: ['fracture', 'tear'],
+      values: { fractureIntensity: 0.5, fractureComplexity: 0.6, aberrationControl: 3, tearIntensity: 0.3, tearBlock: 10 },
     },
   ];
 

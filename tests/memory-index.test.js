@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const {
-  SCHEMA_VERSION, normalizeName, validateRecipe, migrateRecord, makeBranch,
+  SCHEMA_VERSION, normalizeName, validateRecipe, filterKnownEffectOrder, migrateRecord, makeBranch,
 } = require('../memory-index-core.js');
 
 const recipe = {
@@ -23,6 +23,7 @@ assert.deepEqual(normalized.controls, [
   { id: 'haloEnable', type: 'checkbox', value: 'on', checked: true },
 ]);
 assert.deepEqual(normalized.effectOrder, ['halo', 'fracture']);
+assert.deepEqual(filterKnownEffectOrder(['sprite8', 'halo', 'retiredEffect', 'halo'], ['halo', 'fracture']), ['halo'], 'old recipes silently discard retired and duplicate effect keys');
 assert.deepEqual(validateRecipe(JSON.parse(JSON.stringify(normalized))), normalized, 'recipes round-trip through JSON');
 assert.throws(() => validateRecipe({ ...recipe, controls: [...recipe.controls, recipe.controls[0]] }), /duplicate/);
 assert.throws(() => validateRecipe({ ...recipe, controls: [{ id: 'bad id', type: 'range', value: '0' }] }), /invalid/);

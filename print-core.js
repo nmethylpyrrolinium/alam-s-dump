@@ -46,9 +46,10 @@
         const sx = clamp(Math.round(cx), 0, width - 1);
         const sy = clamp(Math.round(cy), 0, height - 1);
         const sampleIndex = (sy * width + sx) * 4;
-        const radius = Math.sqrt(1 - luminance(source, sampleIndex)) * cell * 0.48;
+        const isPureWhite = source[sampleIndex] === 255 && source[sampleIndex + 1] === 255 && source[sampleIndex + 2] === 255;
+        const radius = isPureWhite ? 0 : Math.sqrt(1 - luminance(source, sampleIndex)) * cell * 0.48;
         const distance = Math.hypot(x - cx, y - cy);
-        const coverage = clamp(radius + 0.5 - distance, 0, 1);
+        const coverage = radius <= 0 ? 0 : clamp(radius + 0.5 - distance, 0, 1);
         const index = (y * width + x) * 4;
         for (let channel = 0; channel < 3; channel += 1) {
           output[index + channel] = paper[channel] * (1 - coverage) + ink[channel] * coverage;
@@ -60,20 +61,5 @@
     return { data: output, width, height };
   }
 
-  function compositeDarkDots(sourceImageData, dotImageData) {
-    const source = sourceImageData?.data;
-    const dots = dotImageData?.data;
-    if (!source || !dots || source.length !== dots.length) throw new TypeError('Matching RGBA images are required.');
-    const data = new Uint8ClampedArray(source.length);
-    for (let i = 0; i < source.length; i += 4) {
-      const factor = luminance(dots, i);
-      data[i] = source[i] * factor;
-      data[i + 1] = source[i + 1] * factor;
-      data[i + 2] = source[i + 2] * factor;
-      data[i + 3] = source[i + 3];
-    }
-    return { data, width: sourceImageData.width, height: sourceImageData.height };
-  }
-
-  return { renderHalftone, compositeDarkDots };
+  return { renderHalftone };
 });

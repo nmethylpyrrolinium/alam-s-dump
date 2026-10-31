@@ -132,24 +132,6 @@
     ctx.restore();
   }
 
-  function applyEtherealDiffusion(canvas, strength, blurRadius, highlightBias) {
-    if (strength <= 0) return;
-    const ctx = canvas.getContext('2d');
-    const copy = snapshot(canvas);
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.globalAlpha = clamp01(strength) * 0.5;
-    ctx.filter = `blur(${Math.max(1, blurRadius)}px)`;
-    ctx.drawImage(copy, 0, 0);
-    ctx.restore();
-    ctx.save();
-    ctx.globalCompositeOperation = 'screen';
-    ctx.globalAlpha = clamp01(strength) * clamp01(highlightBias) * 0.4;
-    ctx.filter = `blur(${Math.max(2, blurRadius * 2)}px) brightness(1.3)`;
-    ctx.drawImage(copy, 0, 0);
-    ctx.restore();
-  }
-
   function applyGodRays(canvas, strength, angleDeg, length) {
     if (strength <= 0) return;
     const ctx = canvas.getContext('2d');
@@ -218,30 +200,6 @@
     ctx.restore();
   }
 
-  function applyChromaBoost(canvas, strength, flicker, seed) {
-    if (strength <= 0) return;
-    const { ctx, imageData } = getImageData(canvas);
-    const { data, width, height } = imageData;
-    const source = new Uint8ClampedArray(data);
-    const rand = seededRandom(seed);
-    const jitter = flicker ? (rand() - 0.5) * 2 : 0;
-    const shift = Math.max(1, Math.round(strength * 6 * (1 + jitter * 0.4)));
-
-    for (let y = 0; y < height; y += 1) {
-      for (let x = 0; x < width; x += 1) {
-        const index = (y * width + x) * 4;
-        const edge = Math.hypot(x / width - 0.5, y / height - 0.5) / 0.7071;
-        const localShift = Math.round(shift * smoothstep(0.1, 1, edge));
-        const rX = clamp(x + localShift, 0, width - 1);
-        const bX = clamp(x - localShift, 0, width - 1);
-        data[index] = source[(y * width + rX) * 4];
-        data[index + 2] = source[(y * width + bX) * 4 + 2];
-      }
-    }
-
-    ctx.putImageData(imageData, 0, 0);
-  }
-
   function applySignalTear(canvas, intensity, blockSize, seed) {
     if (intensity <= 0) return;
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -291,11 +249,9 @@
     leak2: { enabledId: 'leak2Enable', run: (canvas, seed) => applyDirectionalLightLeak(canvas, num('leak2Strength', 0.4), num('leak2Angle', 45), num('leak2Warmth', 0.7), num('leak2Fade', 0.5)) },
     bleach: { enabledId: 'bleachEnable', run: (canvas, seed) => applyBleachBypass(canvas, num('bleachStrength', 0.4), num('bleachRecovery', 0.3)) },
     orton: { enabledId: 'ortonEnable', run: (canvas, seed) => applyOrtonGlow(canvas, num('ortonAmount', 0.35), num('ortonBlur', 8)) },
-    diffuse: { enabledId: 'diffuseEnable', run: (canvas, seed) => applyEtherealDiffusion(canvas, num('diffuseStrength', 0.35), num('diffuseBlur', 6), num('diffuseHighlight', 0.5)) },
     godray: { enabledId: 'godrayEnable', run: (canvas, seed) => applyGodRays(canvas, num('godrayStrength', 0.35), num('godrayAngle', 200), num('godrayLength', 0.6)) },
     fog: { enabledId: 'fogEnable', run: (canvas, seed) => applyLiminalFog(canvas, num('fogDensity', 0.3), num('fogTint', 0.5), num('fogFalloff', 0.5)) },
     fracture: { enabledId: 'fractureEnable', run: (canvas, seed) => applyPrismShatter(canvas, num('fractureIntensity', 0.4), num('fractureComplexity', 0.5), seed + 3) },
-    chromaBoost: { enabledId: 'chromaBoostEnable', run: (canvas, seed) => applyChromaBoost(canvas, num('chromaBoostStrength', 0.35), bool('chromaBoostFlicker'), seed + 5) },
     tear: { enabledId: 'tearEnable', run: (canvas, seed) => applySignalTear(canvas, num('tearIntensity', 0.4), num('tearBlock', 8), seed + 7) },
     spectral: { enabledId: 'spectralEnable', run: (canvas, seed) => applySpectralShift(canvas, num('spectralAmount', 0.18), num('spectralBleed', 2), num('spectralAngle', 0)) },
   };
@@ -322,20 +278,15 @@
     const rangeIds = [
       'haloStrength', 'haloRadius', 'haloWarmth',
       'leak2Strength', 'leak2Angle', 'leak2Warmth', 'leak2Fade',
-      'bleachStrength', 'bleachRecovery',
-      'ortonAmount', 'ortonBlur',
-      'diffuseStrength', 'diffuseBlur', 'diffuseHighlight',
+      'bleachStrength', 'bleachRecovery', 'ortonAmount', 'ortonBlur',
       'godrayStrength', 'godrayAngle', 'godrayLength',
       'fogDensity', 'fogTint', 'fogFalloff',
-      'fractureIntensity', 'fractureComplexity',
-      'chromaBoostStrength',
-      'tearIntensity', 'tearBlock',
+      'fractureIntensity', 'fractureComplexity', 'tearIntensity', 'tearBlock',
       'spectralAmount', 'spectralBleed', 'spectralAngle',
     ];
     const toggleIds = [
-      'haloEnable', 'leak2Enable', 'bleachEnable', 'ortonEnable', 'diffuseEnable',
-      'godrayEnable', 'fogEnable', 'fractureEnable', 'chromaBoostEnable',
-      'chromaBoostFlicker', 'tearEnable', 'spectralEnable',
+      'haloEnable', 'leak2Enable', 'bleachEnable', 'ortonEnable',
+      'godrayEnable', 'fogEnable', 'fractureEnable', 'tearEnable', 'spectralEnable',
     ];
     const rerender = () => window.alamsDumpRerender?.();
     rangeIds.forEach((id) => document.getElementById(id)?.addEventListener('input', rerender));
